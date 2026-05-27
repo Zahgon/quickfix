@@ -16,8 +16,6 @@
 package quickfix
 
 import (
-	"fmt"
-	"strconv"
 	"time"
 )
 
@@ -31,9 +29,7 @@ type ConditionallyRequiredSetting struct {
 	Setting string
 }
 
-func (e ConditionallyRequiredSetting) Error() string {
-	return fmt.Sprintf("Conditionally Required Setting: %v", e.Setting)
-}
+func (e ConditionallyRequiredSetting) Error() string { _ = "STUB: not implemented"; return "" }
 
 // IncorrectFormatForSetting indicates a setting that is incorrectly formatted.
 type IncorrectFormatForSetting struct {
@@ -42,128 +38,63 @@ type IncorrectFormatForSetting struct {
 	Err     error
 }
 
-func (e IncorrectFormatForSetting) Error() string {
-	return fmt.Sprintf("%q is invalid for %s", e.Value, e.Setting)
-}
+func (e IncorrectFormatForSetting) Error() string { _ = "STUB: not implemented"; return "" }
 
 // Init initializes or resets SessionSettings.
-func (s *SessionSettings) Init() {
-	s.settings = make(map[string][]byte)
-}
+func (s *SessionSettings) Init() { _ = "STUB: not implemented"; return }
 
 // NewSessionSettings returns a newly initialized SessionSettings instance.
-func NewSessionSettings() *SessionSettings {
-	s := &SessionSettings{}
-	s.Init()
-
-	return s
-}
+func NewSessionSettings() *SessionSettings { _ = "STUB: not implemented"; return nil }
 
 // SetRaw assigns a value to a setting on SessionSettings.
 func (s *SessionSettings) SetRaw(setting string, val []byte) {
+	_ = "STUB: not implemented"
 	// Lazy init.
-	if s.settings == nil {
-		s.Init()
-	}
-
-	s.settings[setting] = val
+	return
 }
 
 // Set assigns a string value to a setting on SessionSettings.
 func (s *SessionSettings) Set(setting string, val string) {
+	_ = "STUB: not implemented"
 	// Lazy init
-	if s.settings == nil {
-		s.Init()
-	}
-
-	s.settings[setting] = []byte(val)
+	return
 }
 
 // HasSetting returns true if a setting is set, false if not.
-func (s *SessionSettings) HasSetting(setting string) bool {
-	_, ok := s.settings[setting]
-	return ok
-}
+func (s *SessionSettings) HasSetting(setting string) bool { _ = "STUB: not implemented"; return false }
 
 // RawSetting is a settings accessor that returns the raw byte slice value of
 // the setting. Returns an error if the setting is missing.
 func (s *SessionSettings) RawSetting(setting string) ([]byte, error) {
-	val, ok := s.settings[setting]
-	if !ok {
-		return nil, ConditionallyRequiredSetting{Setting: setting}
-	}
-
-	return val, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Setting is a settings string accessor. Returns an error if the setting is missing.
 func (s *SessionSettings) Setting(setting string) (string, error) {
-	val, err := s.RawSetting(setting)
-	if err != nil {
-		return "", err
-	}
-
-	return string(val), nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // IntSetting returns the requested setting parsed as an int.  Returns an errror if the setting is not set or cannot be parsed as an int.
 func (s *SessionSettings) IntSetting(setting string) (int, error) {
-	rawVal, err := s.RawSetting(setting)
-	if err != nil {
-		return 0, err
-	}
-
-	if val, err := strconv.Atoi(string(rawVal)); err == nil {
-		return val, nil
-	}
-
-	return 0, IncorrectFormatForSetting{Setting: setting, Value: rawVal, Err: err}
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 // DurationSetting returns the requested setting parsed as a time.Duration.
 // Returns an error if the setting is not set or cannot be parsed as a time.Duration.
 func (s *SessionSettings) DurationSetting(setting string) (time.Duration, error) {
-	rawVal, err := s.RawSetting(setting)
-	if err != nil {
-		return 0, err
-	}
-
-	if val, err := time.ParseDuration(string(rawVal)); err == nil {
-		return val, nil
-	}
-
-	return 0, IncorrectFormatForSetting{Setting: setting, Value: rawVal, Err: err}
+	_ = "STUB: not implemented"
+	return *new(time.Duration), nil
 }
 
 // BoolSetting returns the requested setting parsed as a boolean.  Returns an error if the setting is not set or cannot be parsed as a bool.
 func (s SessionSettings) BoolSetting(setting string) (bool, error) {
-	rawVal, err := s.RawSetting(setting)
-	if err != nil {
-		return false, err
-	}
-
-	switch string(rawVal) {
-	case "Y", "y":
-		return true, nil
-	case "N", "n":
-		return false, nil
-	}
-
-	return false, IncorrectFormatForSetting{Setting: setting, Value: rawVal}
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
-func (s *SessionSettings) overlay(overlay *SessionSettings) {
-	for key, val := range overlay.settings {
-		s.settings[key] = val
-	}
-}
+func (s *SessionSettings) overlay(overlay *SessionSettings) { _ = "STUB: not implemented"; return }
 
-func (s *SessionSettings) clone() *SessionSettings {
-	sClone := NewSessionSettings()
-
-	for k, v := range s.settings {
-		sClone.settings[k] = v
-	}
-
-	return sClone
-}
+func (s *SessionSettings) clone() *SessionSettings { _ = "STUB: not implemented"; return nil }

@@ -17,21 +17,21 @@ package quickfix
 
 type nullLog struct{}
 
-func (l nullLog) OnIncoming([]byte)                   {}
-func (l nullLog) OnOutgoing([]byte)                   {}
-func (l nullLog) OnEvent(string)                      {}
-func (l nullLog) OnEventf(_ string, _ ...interface{}) {}
+func (l nullLog) OnIncoming([]byte)                   { _ = "STUB: not implemented"; return }
+func (l nullLog) OnOutgoing([]byte)                   { _ = "STUB: not implemented"; return }
+func (l nullLog) OnEvent(string)                      { _ = "STUB: not implemented"; return }
+func (l nullLog) OnEventf(_ string, _ ...interface{}) { _ = "STUB: not implemented"; return }
 
 type nullLogFactory struct{}
 
-func (nullLogFactory) Create() (Log, error) {
-	return nullLog{}, nil
-}
+func (nullLogFactory) Create() (Log, error) { _ = "STUB: not implemented"; return *new(Log), nil }
+
 func (nullLogFactory) CreateSessionLog(_ SessionID) (Log, error) {
-	return nullLog{}, nil
+	_ = "STUB: not implemented"
+	return *
+
+	// NewNullLogFactory creates an instance of LogFactory that returns no-op loggers.
+	new(Log), nil
 }
 
-// NewNullLogFactory creates an instance of LogFactory that returns no-op loggers.
-func NewNullLogFactory() LogFactory {
-	return nullLogFactory{}
-}
+func NewNullLogFactory() LogFactory { _ = "STUB: not implemented"; return *new(LogFactory) }

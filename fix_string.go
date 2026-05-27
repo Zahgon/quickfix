@@ -18,15 +18,8 @@ package quickfix
 // FIXString is a FIX String Value, implements FieldValue.
 type FIXString string
 
-func (f FIXString) String() string {
-	return string(f)
-}
+func (f FIXString) String() string { _ = "STUB: not implemented"; return "" }
 
-func (f *FIXString) Read(bytes []byte) (err error) {
-	*f = FIXString(bytes)
-	return
-}
+func (f *FIXString) Read(bytes []byte) (err error) { _ = "STUB: not implemented"; return nil }
 
-func (f FIXString) Write() []byte {
-	return []byte(f)
-}
+func (f FIXString) Write() []byte { _ = "STUB: not implemented"; return nil }

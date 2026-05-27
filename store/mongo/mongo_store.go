@@ -16,17 +16,11 @@
 package mongo
 
 import (
-	"context"
-	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/quickfixgo/quickfix"
-	"github.com/quickfixgo/quickfix/config"
 )
 
 type mongoStoreFactory struct {
@@ -48,93 +42,32 @@ type mongoStore struct {
 
 // NewStoreFactory returns a mongo-based implementation of MessageStoreFactory.
 func NewStoreFactory(settings *quickfix.Settings) quickfix.MessageStoreFactory {
-	return NewStoreFactoryPrefixed(settings, "")
+	_ = "STUB: not implemented"
+	return *new(quickfix.MessageStoreFactory)
 }
 
 // NewStoreFactoryPrefixed returns a mongo-based implementation of MessageStoreFactory, with prefix on collections.
 func NewStoreFactoryPrefixed(settings *quickfix.Settings, collectionsPrefix string) quickfix.MessageStoreFactory {
-	return mongoStoreFactory{
-		settings:           settings,
-		messagesCollection: collectionsPrefix + "messages",
-		sessionsCollection: collectionsPrefix + "sessions",
-	}
+	_ = "STUB: not implemented"
+	return *new(quickfix.MessageStoreFactory)
 }
 
 // Create creates a new MongoStore implementation of the MessageStore interface.
 func (f mongoStoreFactory) Create(sessionID quickfix.SessionID) (msgStore quickfix.MessageStore, err error) {
-	globalSettings := f.settings.GlobalSettings()
-	dynamicSessions, _ := globalSettings.BoolSetting(config.DynamicSessions)
-
-	sessionSettings, ok := f.settings.SessionSettings()[sessionID]
-	if !ok {
-		if dynamicSessions {
-			sessionSettings = globalSettings
-		} else {
-			return nil, fmt.Errorf("unknown session: %v", sessionID)
-		}
-	}
-	mongoConnectionURL, err := sessionSettings.Setting(config.MongoStoreConnection)
-	if err != nil {
-		return nil, err
-	}
-	mongoDatabase, err := sessionSettings.Setting(config.MongoStoreDatabase)
-	if err != nil {
-		return nil, err
-	}
-
-	// Optional.
-	mongoReplicaSet, _ := sessionSettings.Setting(config.MongoStoreReplicaSet)
-
-	return newMongoStore(sessionID, mongoConnectionURL, mongoDatabase, mongoReplicaSet, f.messagesCollection, f.sessionsCollection)
+	_ = "STUB: not implemented"
+	return *new(quickfix.MessageStore), nil
 }
 
+// Optional.
+
 func newMongoStore(sessionID quickfix.SessionID, mongoURL, mongoDatabase, mongoReplicaSet, messagesCollection, sessionsCollection string) (store *mongoStore, err error) {
-
-	memStore, memErr := quickfix.NewMemoryStoreFactory().Create(sessionID)
-	if memErr != nil {
-		err = errors.Wrap(memErr, "cache creation")
-		return
-	}
-
-	allowTransactions := len(mongoReplicaSet) > 0
-	store = &mongoStore{
-		sessionID:          sessionID,
-		cache:              memStore,
-		mongoURL:           mongoURL,
-		mongoDatabase:      mongoDatabase,
-		messagesCollection: messagesCollection,
-		sessionsCollection: sessionsCollection,
-		allowTransactions:  allowTransactions,
-	}
-
-	if err = store.cache.Reset(); err != nil {
-		err = errors.Wrap(err, "cache reset")
-		return
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	store.db, err = mongo.Connect(ctx, options.Client().ApplyURI(mongoURL).SetDirect(len(mongoReplicaSet) == 0).SetReplicaSet(mongoReplicaSet))
-	if err != nil {
-		return
-	}
-	err = store.populateCache()
-
-	return
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func generateMessageFilter(s *quickfix.SessionID) (messageFilter *mongoQuickFixEntryData) {
-	messageFilter = &mongoQuickFixEntryData{
-		BeginString:      s.BeginString,
-		SessionQualifier: s.Qualifier,
-		SenderCompID:     s.SenderCompID,
-		SenderSubID:      s.SenderSubID,
-		SenderLocID:      s.SenderLocationID,
-		TargetCompID:     s.TargetCompID,
-		TargetSubID:      s.TargetSubID,
-		TargetLocID:      s.TargetLocationID,
-	}
-	return
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type mongoQuickFixEntryData struct {
@@ -157,237 +90,75 @@ type mongoQuickFixEntryData struct {
 }
 
 // Reset deletes the store records and sets the seqnums back to 1.
-func (store *mongoStore) Reset() error {
-	msgFilter := generateMessageFilter(&store.sessionID)
-	_, err := store.db.Database(store.mongoDatabase).Collection(store.messagesCollection).DeleteMany(context.Background(), msgFilter)
-
-	if err != nil {
-		return err
-	}
-
-	if err = store.cache.Reset(); err != nil {
-		return err
-	}
-
-	sessionUpdate := generateMessageFilter(&store.sessionID)
-	sessionUpdate.CreationTime = store.cache.CreationTime()
-	sessionUpdate.IncomingSeqNum = store.cache.NextTargetMsgSeqNum()
-	sessionUpdate.OutgoingSeqNum = store.cache.NextSenderMsgSeqNum()
-	_, err = store.db.Database(store.mongoDatabase).Collection(store.sessionsCollection).UpdateOne(context.Background(), msgFilter, bson.M{"$set": sessionUpdate})
-
-	return err
-}
+func (store *mongoStore) Reset() error { _ = "STUB: not implemented"; return nil }
 
 // Refresh reloads the store from the database.
-func (store *mongoStore) Refresh() error {
-	if err := store.cache.Reset(); err != nil {
-		return err
-	}
-	return store.populateCache()
-}
+func (store *mongoStore) Refresh() error { _ = "STUB: not implemented"; return nil }
 
-func (store *mongoStore) populateCache() error {
-	msgFilter := generateMessageFilter(&store.sessionID)
-	res := store.db.Database(store.mongoDatabase).Collection(store.sessionsCollection).FindOne(context.Background(), msgFilter)
-	if res.Err() != nil && res.Err() != mongo.ErrNoDocuments {
-		return errors.Wrap(res.Err(), "query")
-	}
+func (store *mongoStore) populateCache() error { _ = "STUB: not implemented"; return nil }
 
-	if res.Err() != mongo.ErrNoDocuments {
-		// session record found, load it
-		sessionData := &mongoQuickFixEntryData{}
-		if err := res.Decode(&sessionData); err != nil {
-			return errors.Wrap(err, "decode")
-		}
+// session record found, load it
 
-		store.cache.SetCreationTime(sessionData.CreationTime)
-		if err := store.cache.SetNextTargetMsgSeqNum(sessionData.IncomingSeqNum); err != nil {
-			return errors.Wrap(err, "cache set next target")
-		}
-
-		if err := store.cache.SetNextSenderMsgSeqNum(sessionData.OutgoingSeqNum); err != nil {
-			return errors.Wrap(err, "cache set next sender")
-		}
-
-		return nil
-	}
-
-	// session record not found, create it
-	msgFilter.CreationTime = store.cache.CreationTime()
-	msgFilter.IncomingSeqNum = store.cache.NextTargetMsgSeqNum()
-	msgFilter.OutgoingSeqNum = store.cache.NextSenderMsgSeqNum()
-
-	if _, err := store.db.Database(store.mongoDatabase).Collection(store.sessionsCollection).InsertOne(context.Background(), msgFilter); err != nil {
-		return errors.Wrap(err, "insert")
-	}
-	return nil
-}
+// session record not found, create it
 
 // NextSenderMsgSeqNum returns the next MsgSeqNum that will be sent.
-func (store *mongoStore) NextSenderMsgSeqNum() int {
-	return store.cache.NextSenderMsgSeqNum()
-}
+func (store *mongoStore) NextSenderMsgSeqNum() int { _ = "STUB: not implemented"; return 0 }
 
 // NextTargetMsgSeqNum returns the next MsgSeqNum that should be received.
-func (store *mongoStore) NextTargetMsgSeqNum() int {
-	return store.cache.NextTargetMsgSeqNum()
-}
+func (store *mongoStore) NextTargetMsgSeqNum() int { _ = "STUB: not implemented"; return 0 }
 
 // SetNextSenderMsgSeqNum sets the next MsgSeqNum that will be sent.
 func (store *mongoStore) SetNextSenderMsgSeqNum(next int) error {
-	msgFilter := generateMessageFilter(&store.sessionID)
-	sessionUpdate := generateMessageFilter(&store.sessionID)
-	sessionUpdate.IncomingSeqNum = store.cache.NextTargetMsgSeqNum()
-	sessionUpdate.OutgoingSeqNum = next
-	sessionUpdate.CreationTime = store.cache.CreationTime()
-	if _, err := store.db.Database(store.mongoDatabase).Collection(store.sessionsCollection).UpdateOne(context.Background(), msgFilter, bson.M{"$set": sessionUpdate}); err != nil {
-		return err
-	}
-	return store.cache.SetNextSenderMsgSeqNum(next)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SetNextTargetMsgSeqNum sets the next MsgSeqNum that should be received.
 func (store *mongoStore) SetNextTargetMsgSeqNum(next int) error {
-	msgFilter := generateMessageFilter(&store.sessionID)
-	sessionUpdate := generateMessageFilter(&store.sessionID)
-	sessionUpdate.IncomingSeqNum = next
-	sessionUpdate.OutgoingSeqNum = store.cache.NextSenderMsgSeqNum()
-	sessionUpdate.CreationTime = store.cache.CreationTime()
-	if _, err := store.db.Database(store.mongoDatabase).Collection(store.sessionsCollection).UpdateOne(context.Background(), msgFilter, bson.M{"$set": sessionUpdate}); err != nil {
-		return err
-	}
-	return store.cache.SetNextTargetMsgSeqNum(next)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // IncrNextSenderMsgSeqNum increments the next MsgSeqNum that will be sent.
-func (store *mongoStore) IncrNextSenderMsgSeqNum() error {
-	if err := store.SetNextSenderMsgSeqNum(store.cache.NextSenderMsgSeqNum() + 1); err != nil {
-		return errors.Wrap(err, "save sequence number")
-	}
-	return nil
-}
+func (store *mongoStore) IncrNextSenderMsgSeqNum() error { _ = "STUB: not implemented"; return nil }
 
 // IncrNextTargetMsgSeqNum increments the next MsgSeqNum that should be received.
-func (store *mongoStore) IncrNextTargetMsgSeqNum() error {
-	if err := store.SetNextTargetMsgSeqNum(store.cache.NextTargetMsgSeqNum() + 1); err != nil {
-		return errors.Wrap(err, "save sequence number")
-	}
-	return nil
-}
+func (store *mongoStore) IncrNextTargetMsgSeqNum() error { _ = "STUB: not implemented"; return nil }
 
 // CreationTime returns the creation time of the store.
 func (store *mongoStore) CreationTime() time.Time {
-	return store.cache.CreationTime()
+	_ = "STUB: not implemented"
+	return *new(time.Time)
 }
 
 // SetCreationTime is a no-op for MongoStore.
-func (store *mongoStore) SetCreationTime(_ time.Time) {
-}
+func (store *mongoStore) SetCreationTime(_ time.Time) { _ = "STUB: not implemented"; return }
 
 func (store *mongoStore) SaveMessage(seqNum int, msg []byte) (err error) {
-	msgFilter := generateMessageFilter(&store.sessionID)
-	msgFilter.Msgseq = seqNum
-	msgFilter.Message = msg
-	_, err = store.db.Database(store.mongoDatabase).Collection(store.messagesCollection).InsertOne(context.Background(), msgFilter)
-	return
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (store *mongoStore) SaveMessageAndIncrNextSenderMsgSeqNum(seqNum int, msg []byte) error {
-
-	if !store.allowTransactions {
-		err := store.SaveMessage(seqNum, msg)
-		if err != nil {
-			return err
-		}
-		return store.IncrNextSenderMsgSeqNum()
-	}
-
-	// If the mongodb supports replicasets, perform this operation as a transaction instead-
-	var next int
-	err := store.db.UseSession(context.Background(), func(sessionCtx mongo.SessionContext) error {
-		if err := sessionCtx.StartTransaction(); err != nil {
-			return err
-		}
-
-		msgFilter := generateMessageFilter(&store.sessionID)
-		msgFilter.Msgseq = seqNum
-		msgFilter.Message = msg
-		_, err := store.db.Database(store.mongoDatabase).Collection(store.messagesCollection).InsertOne(sessionCtx, msgFilter)
-		if err != nil {
-			return err
-		}
-
-		next = store.cache.NextSenderMsgSeqNum() + 1
-
-		msgFilter = generateMessageFilter(&store.sessionID)
-		sessionUpdate := generateMessageFilter(&store.sessionID)
-		sessionUpdate.IncomingSeqNum = store.cache.NextTargetMsgSeqNum()
-		sessionUpdate.OutgoingSeqNum = next
-		sessionUpdate.CreationTime = store.cache.CreationTime()
-		_, err = store.db.Database(store.mongoDatabase).Collection(store.sessionsCollection).UpdateOne(sessionCtx, msgFilter, bson.M{"$set": sessionUpdate})
-		if err != nil {
-			return err
-		}
-
-		return sessionCtx.CommitTransaction(context.Background())
-	})
-	if err != nil {
-		return err
-	}
-
-	return store.cache.SetNextSenderMsgSeqNum(next)
-}
-
-func (store *mongoStore) IterateMessages(beginSeqNum, endSeqNum int, cb func([]byte) error) error {
-	msgFilter := generateMessageFilter(&store.sessionID)
-	// Marshal into database form.
-	msgFilterBytes, err := bson.Marshal(msgFilter)
-	if err != nil {
-		return err
-	}
-	seqFilter := bson.M{}
-	err = bson.Unmarshal(msgFilterBytes, &seqFilter)
-	if err != nil {
-		return err
-	}
-	// Modify the query to use a range for the sequence filter.
-	seqFilter["msgseq"] = bson.M{
-		"$gte": beginSeqNum,
-		"$lte": endSeqNum,
-	}
-	sortOpt := options.Find().SetSort(bson.D{{Key: "msgseq", Value: 1}})
-	cursor, err := store.db.Database(store.mongoDatabase).Collection(store.messagesCollection).Find(context.Background(), seqFilter, sortOpt)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = cursor.Close(context.Background()) }()
-	for cursor.Next(context.Background()) {
-		if err = cursor.Decode(&msgFilter); err != nil {
-			return err
-		} else if err = cb(msgFilter.Message); err != nil {
-			return err
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
+// If the mongodb supports replicasets, perform this operation as a transaction instead-
+
+func (store *mongoStore) IterateMessages(beginSeqNum, endSeqNum int, cb func([]byte) error) error {
+	_ = "STUB: not implemented"
+	return nil
+}
+
+// Marshal into database form.
+
+// Modify the query to use a range for the sequence filter.
+
 func (store *mongoStore) GetMessages(beginSeqNum, endSeqNum int) ([][]byte, error) {
-	var msgs [][]byte
-	err := store.IterateMessages(beginSeqNum, endSeqNum, func(msg []byte) error {
-		msgs = append(msgs, msg)
-		return nil
-	})
-	return msgs, err
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Close closes the store's database connection.
-func (store *mongoStore) Close() error {
-	if store.db != nil {
-		err := store.db.Disconnect(context.Background())
-		if err != nil {
-			return errors.Wrap(err, "error disconnecting from database")
-		}
-		store.db = nil
-	}
-	return nil
-}
+func (store *mongoStore) Close() error { _ = "STUB: not implemented"; return nil }

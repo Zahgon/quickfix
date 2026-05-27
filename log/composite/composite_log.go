@@ -23,59 +23,30 @@ type compositeLog struct {
 	logs []quickfix.Log
 }
 
-func (l compositeLog) OnIncoming(s []byte) {
-	for _, log := range l.logs {
-		log.OnIncoming(s)
-	}
-}
+func (l compositeLog) OnIncoming(s []byte) { _ = "STUB: not implemented"; return }
 
-func (l compositeLog) OnOutgoing(s []byte) {
-	for _, log := range l.logs {
-		log.OnOutgoing(s)
-	}
-}
+func (l compositeLog) OnOutgoing(s []byte) { _ = "STUB: not implemented"; return }
 
-func (l compositeLog) OnEvent(s string) {
-	for _, log := range l.logs {
-		log.OnEvent(s)
-	}
-}
+func (l compositeLog) OnEvent(s string) { _ = "STUB: not implemented"; return }
 
-func (l compositeLog) OnEventf(format string, a ...interface{}) {
-	for _, log := range l.logs {
-		log.OnEventf(format, a)
-	}
-}
+func (l compositeLog) OnEventf(format string, a ...interface{}) { _ = "STUB: not implemented"; return }
 
 type compositeLogFactory struct {
 	logFactories []quickfix.LogFactory
 }
 
 func (clf compositeLogFactory) Create() (quickfix.Log, error) {
-	logs := []quickfix.Log{}
-	for _, lf := range clf.logFactories {
-		log, err := lf.Create()
-		if err != nil {
-			return nil, err
-		}
-		logs = append(logs, log)
-	}
-	return compositeLog{logs}, nil
+	_ = "STUB: not implemented"
+	return *new(quickfix.Log), nil
 }
 
 func (clf compositeLogFactory) CreateSessionLog(sessionID quickfix.SessionID) (quickfix.Log, error) {
-	logs := []quickfix.Log{}
-	for _, lf := range clf.logFactories {
-		log, err := lf.CreateSessionLog(sessionID)
-		if err != nil {
-			return nil, err
-		}
-		logs = append(logs, log)
-	}
-	return compositeLog{logs}, nil
+	_ = "STUB: not implemented"
+	return *new(quickfix.Log), nil
 }
 
 // NewLogFactory creates an instance of LogFactory that writes messages and events to stdout.
 func NewLogFactory(logfactories []quickfix.LogFactory) quickfix.LogFactory {
-	return compositeLogFactory{logfactories}
+	_ = "STUB: not implemented"
+	return *new(quickfix.LogFactory)
 }

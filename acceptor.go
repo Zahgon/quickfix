@@ -16,18 +16,10 @@
 package quickfix
 
 import (
-	"bufio"
 	"bytes"
 	"crypto/tls"
-	"io"
 	"net"
-	"runtime/debug"
-	"strconv"
 	"sync"
-
-	proxyproto "github.com/pires/go-proxyproto"
-
-	"github.com/quickfixgo/quickfix/config"
 )
 
 // Acceptor accepts connections from FIX clients and manages the associated sessions.
@@ -64,366 +56,34 @@ type ConnectionValidator interface {
 type NewListenerCallback func(address string, tlsConfig *tls.Config) (net.Listener, error)
 
 // Start accepting connections.
-func (a *Acceptor) Start() (err error) {
-	socketAcceptHost := ""
-	if a.settings.GlobalSettings().HasSetting(config.SocketAcceptHost) {
-		if socketAcceptHost, err = a.settings.GlobalSettings().Setting(config.SocketAcceptHost); err != nil {
-			return
-		}
-	}
-
-	a.sessionHostPort = make(map[SessionID]int)
-	a.listeners = make(map[string]net.Listener)
-	for sessionID, sessionSettings := range a.settings.SessionSettings() {
-		if sessionSettings.HasSetting(config.SocketAcceptPort) {
-			if a.sessionHostPort[sessionID], err = sessionSettings.IntSetting(config.SocketAcceptPort); err != nil {
-				return
-			}
-		} else if a.sessionHostPort[sessionID], err = a.settings.GlobalSettings().IntSetting(config.SocketAcceptPort); err != nil {
-			return
-		}
-		address := net.JoinHostPort(socketAcceptHost, strconv.Itoa(a.sessionHostPort[sessionID]))
-		a.listeners[address] = nil
-	}
-
-	if a.tlsConfig == nil {
-		var tlsConfig *tls.Config
-		if tlsConfig, err = loadTLSConfig(a.settings.GlobalSettings()); err != nil {
-			return
-		}
-		a.tlsConfig = tlsConfig
-	}
-
-	if a.newListenerCallback == nil {
-		a.newListenerCallback = func(address string, tlsConfig *tls.Config) (net.Listener, error) {
-			if tlsConfig != nil {
-				return tls.Listen("tcp", address, a.tlsConfig)
-			}
-			return net.Listen("tcp", address)
-		}
-	}
-
-	var useTCPProxy bool
-	if a.settings.GlobalSettings().HasSetting(config.UseTCPProxy) {
-		if useTCPProxy, err = a.settings.GlobalSettings().BoolSetting(config.UseTCPProxy); err != nil {
-			return
-		}
-	}
-
-	for address := range a.listeners {
-		if a.listeners[address], err = a.newListenerCallback(address, a.tlsConfig); err != nil {
-			return
-		} else if useTCPProxy {
-			a.listeners[address] = &proxyproto.Listener{Listener: a.listeners[address]}
-		}
-	}
-
-	for _, s := range a.sessions {
-		a.sessionGroup.Add(1)
-		go func(s *session) {
-			s.run()
-			a.sessionGroup.Done()
-		}(s)
-	}
-	if a.dynamicSessions {
-		a.dynamicSessionChan = make(chan *session)
-		a.sessionGroup.Add(1)
-		go func() {
-			a.dynamicSessionsLoop()
-			a.sessionGroup.Done()
-		}()
-	}
-	a.listenerShutdown.Add(len(a.listeners))
-	for _, listener := range a.listeners {
-		go a.listenForConnections(listener)
-	}
-	return
-}
+func (a *Acceptor) Start() (err error) { _ = "STUB: not implemented"; return nil }
 
 // Stop logs out existing sessions, close their connections, and stop accepting new connections.
-func (a *Acceptor) Stop() {
-	defer func() {
-		_ = recover() // suppress sending on closed channel error
-	}()
+func (a *Acceptor) Stop() { _ = "STUB: not implemented"; return }
 
-	for _, listener := range a.listeners {
-		listener.Close()
-	}
-	a.listenerShutdown.Wait()
-	if a.dynamicSessions {
-		close(a.dynamicSessionChan)
-	}
-	for _, session := range a.sessions {
-		session.stop()
-	}
-	a.sessionGroup.Wait()
-
-	for sessionID := range a.sessions {
-		err := UnregisterSession(sessionID)
-		if err != nil {
-			return
-		}
-	}
-}
+// suppress sending on closed channel error
 
 // RemoteAddr gets remote IP address for a given session.
 func (a *Acceptor) RemoteAddr(sessionID SessionID) (net.Addr, bool) {
-	addr, ok := a.sessionAddr.Load(sessionID)
-	if !ok || addr == nil {
-		return nil, false
-	}
-	val, ok := addr.(net.Addr)
-	return val, ok
+	_ = "STUB: not implemented"
+	return *new(net.Addr), false
 }
 
 // NewAcceptor creates and initializes a new Acceptor.
 func NewAcceptor(app Application, storeFactory MessageStoreFactory, settings *Settings, logFactory LogFactory) (a *Acceptor, err error) {
-	a = &Acceptor{
-		app:             app,
-		storeFactory:    storeFactory,
-		settings:        settings,
-		logFactory:      logFactory,
-		sessions:        make(map[SessionID]*session),
-		sessionHostPort: make(map[SessionID]int),
-		listeners:       make(map[string]net.Listener),
-	}
-	if a.settings.GlobalSettings().HasSetting(config.DynamicSessions) {
-		if a.dynamicSessions, err = settings.globalSettings.BoolSetting(config.DynamicSessions); err != nil {
-			return
-		}
-
-		if a.settings.GlobalSettings().HasSetting(config.DynamicQualifier) {
-			if a.dynamicQualifier, err = settings.globalSettings.BoolSetting(config.DynamicQualifier); err != nil {
-				return
-			}
-		}
-	}
-
-	if a.globalLog, err = logFactory.Create(); err != nil {
-		return
-	}
-
-	for sessionID, sessionSettings := range settings.SessionSettings() {
-		sessID := sessionID
-		sessID.Qualifier = ""
-
-		if _, dup := a.sessions[sessID]; dup {
-			return a, errDuplicateSessionID
-		}
-
-		if a.sessions[sessID], err = a.createSession(sessionID, storeFactory, sessionSettings, logFactory, app); err != nil {
-			return
-		}
-	}
-
-	return
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (a *Acceptor) listenForConnections(listener net.Listener) {
-	defer a.listenerShutdown.Done()
+func (a *Acceptor) listenForConnections(listener net.Listener) { _ = "STUB: not implemented"; return }
 
-	for {
-		netConn, err := listener.Accept()
-		if err != nil {
-			return
-		}
+func (a *Acceptor) invalidMessage(msg *bytes.Buffer, err error) { _ = "STUB: not implemented"; return }
 
-		go func() {
-			a.handleConnection(netConn)
-		}()
-	}
-}
+func (a *Acceptor) handleConnection(netConn net.Conn) { _ = "STUB: not implemented"; return }
 
-func (a *Acceptor) invalidMessage(msg *bytes.Buffer, err error) {
-	a.globalLog.OnEventf("Invalid Message: %s, %v", msg.Bytes(), err.Error())
-}
+// We have a session ID and a network connection. This seems to be a good place for any custom authentication logic.
 
-func (a *Acceptor) handleConnection(netConn net.Conn) {
-	defer func() {
-		if err := recover(); err != nil {
-			a.globalLog.OnEventf("Connection Terminated with Panic: %s", debug.Stack())
-		}
-
-		if err := netConn.Close(); err != nil {
-			a.globalLog.OnEvent(err.Error())
-		}
-	}()
-
-	reader := bufio.NewReader(netConn)
-	parser := newParser(reader)
-
-	msgBytes, err := parser.ReadMessage()
-	if err != nil {
-		if err == io.EOF {
-			a.globalLog.OnEvent("Connection Terminated")
-		} else {
-			a.globalLog.OnEvent(err.Error())
-		}
-		return
-	}
-
-	msg := NewMessage()
-	err = ParseMessage(msg, msgBytes)
-	if err != nil {
-		a.invalidMessage(msgBytes, err)
-		return
-	}
-
-	var beginString FIXString
-	if err := msg.Header.GetField(tagBeginString, &beginString); err != nil {
-		a.invalidMessage(msgBytes, err)
-		return
-	}
-
-	var senderCompID FIXString
-	if err := msg.Header.GetField(tagSenderCompID, &senderCompID); err != nil {
-		a.invalidMessage(msgBytes, err)
-		return
-	}
-
-	var senderSubID FIXString
-	if msg.Header.Has(tagSenderSubID) {
-		if err := msg.Header.GetField(tagSenderSubID, &senderSubID); err != nil {
-			a.invalidMessage(msgBytes, err)
-			return
-		}
-	}
-
-	var senderLocationID FIXString
-	if msg.Header.Has(tagSenderLocationID) {
-		if err := msg.Header.GetField(tagSenderLocationID, &senderLocationID); err != nil {
-			a.invalidMessage(msgBytes, err)
-			return
-		}
-	}
-
-	var targetCompID FIXString
-	if err := msg.Header.GetField(tagTargetCompID, &targetCompID); err != nil {
-		a.invalidMessage(msgBytes, err)
-		return
-	}
-
-	var targetSubID FIXString
-	if msg.Header.Has(tagTargetSubID) {
-		if err := msg.Header.GetField(tagTargetSubID, &targetSubID); err != nil {
-			a.invalidMessage(msgBytes, err)
-			return
-		}
-	}
-
-	var targetLocationID FIXString
-	if msg.Header.Has(tagTargetLocationID) {
-		if err := msg.Header.GetField(tagTargetLocationID, &targetLocationID); err != nil {
-			a.invalidMessage(msgBytes, err)
-			return
-		}
-	}
-
-	sessID := SessionID{BeginString: string(beginString),
-		SenderCompID: string(targetCompID), SenderSubID: string(targetSubID), SenderLocationID: string(targetLocationID),
-		TargetCompID: string(senderCompID), TargetSubID: string(senderSubID), TargetLocationID: string(senderLocationID),
-	}
-
-	localConnectionPort := netConn.LocalAddr().(*net.TCPAddr).Port
-	if expectedPort, ok := a.sessionHostPort[sessID]; ok && expectedPort != localConnectionPort {
-		a.globalLog.OnEventf("Session %v not found for incoming message: %s", sessID, msgBytes)
-		return
-	}
-
-	// We have a session ID and a network connection. This seems to be a good place for any custom authentication logic.
-	if a.connectionValidator != nil {
-		if err := a.connectionValidator.Validate(netConn, sessID); err != nil {
-			a.globalLog.OnEventf("Unable to validate a connection for session %v: %v", sessID, err.Error())
-			return
-		}
-	}
-
-	if a.dynamicQualifier {
-		a.dynamicQualifierCount++
-		sessID.Qualifier = strconv.Itoa(a.dynamicQualifierCount)
-	}
-	session, ok := a.sessions[sessID]
-	if !ok {
-		if !a.dynamicSessions {
-			a.globalLog.OnEventf("Session %v not found for incoming message: %s", sessID, msgBytes)
-			return
-		}
-		dynamicSession, err := a.sessionFactory.createSession(sessID, a.storeFactory, a.settings.globalSettings.clone(), a.logFactory, a.app)
-		if err != nil {
-			a.globalLog.OnEventf("Dynamic session %v failed to create: %v", sessID, err)
-			return
-		}
-		a.dynamicSessionChan <- dynamicSession
-		session = dynamicSession
-		defer session.stop()
-	}
-
-	a.sessionAddr.Store(sessID, netConn.RemoteAddr())
-	msgIn := make(chan fixIn, session.InChanCapacity)
-	msgOut := make(chan []byte)
-
-	if err := session.connect(msgIn, msgOut); err != nil {
-		a.globalLog.OnEventf("Unable to accept session %v connection: %v", sessID, err.Error())
-		return
-	}
-
-	go func() {
-		msgIn <- fixIn{msgBytes, parser.lastRead}
-		readLoop(parser, msgIn, a.globalLog)
-	}()
-
-	writeLoop(netConn, msgOut, a.globalLog)
-}
-
-func (a *Acceptor) dynamicSessionsLoop() {
-	var id int
-	var sessions = map[int]*session{}
-	var complete = make(chan int)
-	defer close(complete)
-LOOP:
-	for {
-		select {
-		case session, ok := <-a.dynamicSessionChan:
-			if !ok {
-				for _, oldSession := range sessions {
-					oldSession.stop()
-				}
-				break LOOP
-			}
-			id++
-			sessionID := id
-			sessions[sessionID] = session
-			go func() {
-				session.run()
-				err := UnregisterSession(session.sessionID)
-				if err != nil {
-					a.globalLog.OnEventf("Unregister dynamic session %v failed: %v", session.sessionID, err)
-					return
-				}
-				complete <- sessionID
-			}()
-		case id := <-complete:
-			session, ok := sessions[id]
-			if ok {
-				a.sessionAddr.Delete(session.sessionID)
-				delete(sessions, id)
-			} else {
-				a.globalLog.OnEventf("Missing dynamic session %v!", id)
-			}
-		}
-	}
-
-	if len(sessions) == 0 {
-		return
-	}
-
-	for id := range complete {
-		delete(sessions, id)
-		if len(sessions) == 0 {
-			return
-		}
-	}
-}
+func (a *Acceptor) dynamicSessionsLoop() { _ = "STUB: not implemented"; return }
 
 // SetConnectionValidator sets an optional connection validator.
 // Use it when you need a custom authentication logic that includes lower level interactions,
@@ -432,7 +92,8 @@ LOOP:
 //
 //	a.SetConnectionValidator(nil)
 func (a *Acceptor) SetConnectionValidator(validator ConnectionValidator) {
-	a.connectionValidator = validator
+	_ = "STUB: not implemented"
+	return
 }
 
 // SetTLSConfig allows the creator of the Acceptor to specify a fully customizable tls.Config of their choice,
@@ -441,12 +102,11 @@ func (a *Acceptor) SetConnectionValidator(validator ConnectionValidator) {
 // Note: when the caller explicitly provides a tls.Config with this function,
 // it takes precendent over TLS settings specified in the acceptor's settings.GlobalSettings(),
 // meaning that the `settings.GlobalSettings()` object is not inspected or used for the creation of the tls.Config.
-func (a *Acceptor) SetTLSConfig(tlsConfig *tls.Config) {
-	a.tlsConfig = tlsConfig
-}
+func (a *Acceptor) SetTLSConfig(tlsConfig *tls.Config) { _ = "STUB: not implemented"; return }
 
 // SetNewListenerCallback allows the creator of the Acceptor to specify the callback used to create each net.Listener
 // which will be used in the Start() method.
 func (a *Acceptor) SetNewListenerCallback(cb NewListenerCallback) {
-	a.newListenerCallback = cb
+	_ = "STUB: not implemented"
+	return
 }

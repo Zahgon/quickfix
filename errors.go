@@ -17,7 +17,6 @@ package quickfix
 
 import (
 	"errors"
-	"fmt"
 )
 
 // ErrDoNotSend is a convenience error to indicate a DoNotSend in ToApp.
@@ -58,19 +57,35 @@ type RejectLogon struct {
 	Text string
 }
 
-func (e RejectLogon) Error() string { return e.Text }
+func (e RejectLogon) Error() string {
+	_ = "STUB: not implemented"
 
-// RefTagID implements MessageRejectError.
-func (RejectLogon) RefTagID() *Tag { return nil }
+	// RefTagID implements MessageRejectError.
+	return ""
+}
 
-// RejectReason implements MessageRejectError.
-func (RejectLogon) RejectReason() int { return 0 }
+func (RejectLogon) RefTagID() *Tag {
+	_ = "STUB: not implemented"
 
-// BusinessRejectRefID implements MessageRejectError.
-func (RejectLogon) BusinessRejectRefID() string { return "" }
+	// RejectReason implements MessageRejectError.
+	return nil
+}
 
-// IsBusinessReject implements MessageRejectError.
-func (RejectLogon) IsBusinessReject() bool { return false }
+func (RejectLogon) RejectReason() int {
+	_ = "STUB: not implemented"
+
+	// BusinessRejectRefID implements MessageRejectError.
+	return 0
+}
+
+func (RejectLogon) BusinessRejectRefID() string {
+	_ = "STUB: not implemented"
+
+	// IsBusinessReject implements MessageRejectError.
+	return ""
+}
+
+func (RejectLogon) IsBusinessReject() bool { _ = "STUB: not implemented"; return false }
 
 type messageRejectError struct {
 	rejectReason        int
@@ -80,111 +95,122 @@ type messageRejectError struct {
 	isBusinessReject    bool
 }
 
-func (e messageRejectError) Error() string               { return e.text }
-func (e messageRejectError) RefTagID() *Tag              { return e.refTagID }
-func (e messageRejectError) RejectReason() int           { return e.rejectReason }
-func (e messageRejectError) BusinessRejectRefID() string { return e.businessRejectRefID }
-func (e messageRejectError) IsBusinessReject() bool      { return e.isBusinessReject }
+func (e messageRejectError) Error() string               { _ = "STUB: not implemented"; return "" }
+func (e messageRejectError) RefTagID() *Tag              { _ = "STUB: not implemented"; return nil }
+func (e messageRejectError) RejectReason() int           { _ = "STUB: not implemented"; return 0 }
+func (e messageRejectError) BusinessRejectRefID() string { _ = "STUB: not implemented"; return "" }
+func (e messageRejectError) IsBusinessReject() bool      { _ = "STUB: not implemented"; return false }
 
 // NewMessageRejectError returns a MessageRejectError with the given error message, reject reason, and optional reftagid.
 func NewMessageRejectError(err string, rejectReason int, refTagID *Tag) MessageRejectError {
-	return messageRejectError{text: err, rejectReason: rejectReason, refTagID: refTagID}
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // NewBusinessMessageRejectError returns a MessageRejectError with the given error mesage, reject reason, and optional reftagid.
 // Reject is treated as a business level reject.
 func NewBusinessMessageRejectError(err string, rejectReason int, refTagID *Tag) MessageRejectError {
-	return messageRejectError{text: err, rejectReason: rejectReason, refTagID: refTagID, isBusinessReject: true}
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // NewBusinessMessageRejectErrorWithRefID returns a MessageRejectError with the given error mesage, reject reason, refID, and optional reftagid.
 // Reject is treated as a business level reject.
 func NewBusinessMessageRejectErrorWithRefID(err string, rejectReason int, businessRejectRefID string, refTagID *Tag) MessageRejectError {
-	return messageRejectError{text: err, rejectReason: rejectReason, refTagID: refTagID, businessRejectRefID: businessRejectRefID, isBusinessReject: true}
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // IncorrectDataFormatForValue returns an error indicating a field that cannot be parsed as the type required.
 func IncorrectDataFormatForValue(tag Tag) MessageRejectError {
-	return NewMessageRejectError("Incorrect data format for value", rejectReasonIncorrectDataFormatForValue, &tag)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // repeatingGroupFieldsOutOfOrder returns an error indicating a problem parsing repeating groups fields.
 func repeatingGroupFieldsOutOfOrder(tag Tag, reason string) MessageRejectError {
-	if reason != "" {
-		reason = fmt.Sprintf("Repeating group fields out of order (%s)", reason)
-	} else {
-		reason = "Repeating group fields out of order"
-	}
-	return NewMessageRejectError(reason, rejectReasonRepeatingGroupFieldsOutOfOrder, &tag)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // ValueIsIncorrect returns an error indicating a field with value that is not valid.
 func ValueIsIncorrect(tag Tag) MessageRejectError {
-	return NewMessageRejectError("Value is incorrect (out of range) for this tag", rejectReasonValueIsIncorrect, &tag)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // ConditionallyRequiredFieldMissing indicates that the requested field could not be found in the FIX message.
 func ConditionallyRequiredFieldMissing(tag Tag) MessageRejectError {
-	return NewBusinessMessageRejectError(fmt.Sprintf("Conditionally Required Field Missing (%d)", tag), rejectReasonConditionallyRequiredFieldMissing, &tag)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // valueIsIncorrectNoTag returns an error indicating a field with value that is not valid.
 // FIXME: to be compliant with legacy tests, for certain value issues, do not include reftag? (11c_NewSeqNoLess).
 func valueIsIncorrectNoTag() MessageRejectError {
-	return NewMessageRejectError("Value is incorrect (out of range) for this tag", rejectReasonValueIsIncorrect, nil)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // InvalidMessageType returns an error to indicate an invalid message type.
 func InvalidMessageType() MessageRejectError {
-	return NewMessageRejectError("Invalid MsgType", rejectReasonInvalidMsgType, nil)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // UnsupportedMessageType returns an error to indicate an unhandled message.
 func UnsupportedMessageType() MessageRejectError {
-	return NewBusinessMessageRejectError("Unsupported Message Type", rejectReasonUnsupportedMessageType, nil)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // TagNotDefinedForThisMessageType returns an error for an invalid tag appearing in a message.
 func TagNotDefinedForThisMessageType(tag Tag) MessageRejectError {
-	return NewMessageRejectError("Tag not defined for this message type", rejectReasonTagNotDefinedForThisMessageType, &tag)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // tagAppearsMoreThanOnce return an error for multiple tags in a message not detected as a repeating group.
 func tagAppearsMoreThanOnce(tag Tag) MessageRejectError {
-	return NewMessageRejectError("Tag appears more than once", rejectReasonTagAppearsMoreThanOnce, &tag)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // RequiredTagMissing returns a validation error when a required field cannot be found in a message.
 func RequiredTagMissing(tag Tag) MessageRejectError {
-	return NewMessageRejectError("Required tag missing", rejectReasonRequiredTagMissing, &tag)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // incorrectNumInGroupCountForRepeatingGroup returns a validation error when the num in group value for a group does not match actual group size.
 func incorrectNumInGroupCountForRepeatingGroup(tag Tag) MessageRejectError {
-	return NewMessageRejectError("Incorrect NumInGroup count for repeating group", rejectReasonIncorrectNumInGroupCountForRepeatingGroup, &tag)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // tagSpecifiedOutOfRequiredOrder returns validation error when the group order does not match the spec.
 func tagSpecifiedOutOfRequiredOrder(tag Tag) MessageRejectError {
-	return NewMessageRejectError("Tag specified out of required order", rejectReasonTagSpecifiedOutOfRequiredOrder, &tag)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // TagSpecifiedWithoutAValue returns a validation error for when a field has no value.
 func TagSpecifiedWithoutAValue(tag Tag) MessageRejectError {
-	return NewMessageRejectError("Tag specified without a value", rejectReasonTagSpecifiedWithoutAValue, &tag)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // InvalidTagNumber returns a validation error for messages with invalid tags.
 func InvalidTagNumber(tag Tag) MessageRejectError {
-	return NewMessageRejectError("Invalid tag number", rejectReasonInvalidTagNumber, &tag)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // compIDProblem creates a reject for msg where msg has invalid comp id values.
-func compIDProblem() MessageRejectError {
-	return NewMessageRejectError("CompID problem", rejectReasonCompIDProblem, nil)
-}
+func compIDProblem() MessageRejectError { _ = "STUB: not implemented"; return *new(MessageRejectError) }
 
 // sendingTimeAccuracyProblem creates a reject for a msg with stale or invalid sending time.
 func sendingTimeAccuracyProblem() MessageRejectError {
-	return NewMessageRejectError("SendingTime accuracy problem", rejectReasonSendingTimeAccuracyProblem, nil)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }

@@ -25,11 +25,6 @@ type FIXUDecimal struct {
 	Scale uint8
 }
 
-func (d FIXUDecimal) Write() []byte {
-	return []byte(d.Decimal.Trunc(d.Scale).StringFixed(d.Scale))
-}
+func (d FIXUDecimal) Write() []byte { _ = "STUB: not implemented"; return nil }
 
-func (d *FIXUDecimal) Read(bytes []byte) (err error) {
-	d.Decimal, err = udecimal.Parse(string(bytes))
-	return
-}
+func (d *FIXUDecimal) Read(bytes []byte) (err error) { _ = "STUB: not implemented"; return nil }

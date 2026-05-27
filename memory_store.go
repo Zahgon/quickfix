@@ -17,8 +17,6 @@ package quickfix
 
 import (
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 type memoryStore struct {
@@ -27,105 +25,74 @@ type memoryStore struct {
 	messageMap                       map[int][]byte
 }
 
-func (store *memoryStore) NextSenderMsgSeqNum() int {
-	return store.senderMsgSeqNum + 1
-}
+func (store *memoryStore) NextSenderMsgSeqNum() int { _ = "STUB: not implemented"; return 0 }
 
-func (store *memoryStore) NextTargetMsgSeqNum() int {
-	return store.targetMsgSeqNum + 1
-}
+func (store *memoryStore) NextTargetMsgSeqNum() int { _ = "STUB: not implemented"; return 0 }
 
-func (store *memoryStore) IncrNextSenderMsgSeqNum() error {
-	store.senderMsgSeqNum++
-	return nil
-}
+func (store *memoryStore) IncrNextSenderMsgSeqNum() error { _ = "STUB: not implemented"; return nil }
 
-func (store *memoryStore) IncrNextTargetMsgSeqNum() error {
-	store.targetMsgSeqNum++
-	return nil
-}
+func (store *memoryStore) IncrNextTargetMsgSeqNum() error { _ = "STUB: not implemented"; return nil }
 
 func (store *memoryStore) SetNextSenderMsgSeqNum(nextSeqNum int) error {
-	store.senderMsgSeqNum = nextSeqNum - 1
+	_ = "STUB: not implemented"
 	return nil
 }
+
 func (store *memoryStore) SetNextTargetMsgSeqNum(nextSeqNum int) error {
-	store.targetMsgSeqNum = nextSeqNum - 1
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (store *memoryStore) CreationTime() time.Time {
-	return store.creationTime
+	_ = "STUB: not implemented"
+	return *new(time.Time)
 }
 
-func (store *memoryStore) SetCreationTime(t time.Time) {
-	store.creationTime = t
-}
+func (store *memoryStore) SetCreationTime(t time.Time) { _ = "STUB: not implemented"; return }
 
-func (store *memoryStore) Reset() error {
-	store.senderMsgSeqNum = 0
-	store.targetMsgSeqNum = 0
-	store.creationTime = time.Now()
-	store.messageMap = nil
-	return nil
-}
+func (store *memoryStore) Reset() error { _ = "STUB: not implemented"; return nil }
 
 func (store *memoryStore) Refresh() error {
+	_ = "STUB: not implemented"
 	// NOP, nothing to refresh.
 	return nil
 }
 
 func (store *memoryStore) Close() error {
+	_ = "STUB: not implemented"
 	// NOP, nothing to close.
 	return nil
 }
 
 func (store *memoryStore) SaveMessage(seqNum int, msg []byte) error {
-	if store.messageMap == nil {
-		store.messageMap = make(map[int][]byte)
-	}
-
-	store.messageMap[seqNum] = msg
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (store *memoryStore) SaveMessageAndIncrNextSenderMsgSeqNum(seqNum int, msg []byte) error {
-	err := store.SaveMessage(seqNum, msg)
-	if err != nil {
-		return err
-	}
-	return store.IncrNextSenderMsgSeqNum()
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (store *memoryStore) IterateMessages(beginSeqNum, endSeqNum int, cb func([]byte) error) error {
-	for seqNum := beginSeqNum; seqNum <= endSeqNum; seqNum++ {
-		if m, ok := store.messageMap[seqNum]; ok {
-			if err := cb(m); err != nil {
-				return err
-			}
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (store *memoryStore) GetMessages(beginSeqNum, endSeqNum int) ([][]byte, error) {
-	var msgs [][]byte
-	err := store.IterateMessages(beginSeqNum, endSeqNum, func(m []byte) error {
-		msgs = append(msgs, m)
-		return nil
-	})
-	return msgs, err
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type memoryStoreFactory struct{}
 
 func (f memoryStoreFactory) Create(_ SessionID) (MessageStore, error) {
-	m := new(memoryStore)
-	if err := m.Reset(); err != nil {
-		return m, errors.Wrap(err, "reset")
-	}
-	return m, nil
+	_ = "STUB: not implemented"
+	return *new(MessageStore), nil
 }
 
 // NewMemoryStoreFactory returns a MessageStoreFactory instance that created in-memory MessageStores.
-func NewMemoryStoreFactory() MessageStoreFactory { return memoryStoreFactory{} }
+func NewMemoryStoreFactory() MessageStoreFactory {
+	_ = "STUB: not implemented"
+	return *new(MessageStoreFactory)
+}

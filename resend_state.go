@@ -24,72 +24,17 @@ type resendState struct {
 	resendRangeEnd        int
 }
 
-func (s resendState) String() string { return "Resend" }
+func (s resendState) String() string { _ = "STUB: not implemented"; return "" }
 
 func (s resendState) Timeout(session *session, event internal.Event) (nextState sessionState) {
-	nextState = inSession{}.Timeout(session, event)
-	switch nextState.(type) {
-	case inSession:
-		nextState = s
-	case pendingTimeout:
-		// Wrap pendingTimeout in resend. prevents us falling back to inSession if recovering
-		// from pendingTimeout.
-		nextState = pendingTimeout{s}
-	}
-
-	return
+	_ = "STUB: not implemented"
+	return *new(sessionState)
 }
 
+// Wrap pendingTimeout in resend. prevents us falling back to inSession if recovering
+// from pendingTimeout.
+
 func (s resendState) FixMsgIn(session *session, msg *Message) (nextState sessionState) {
-	nextState = inSession{}.FixMsgIn(session, msg)
-
-	if !nextState.IsLoggedOn() {
-		return
-	}
-
-	if s.currentResendRangeEnd != 0 && s.currentResendRangeEnd < session.store.NextTargetMsgSeqNum() {
-		nextResendState, err := session.sendResendRequest(session.store.NextTargetMsgSeqNum(), s.resendRangeEnd)
-		if err != nil {
-			return handleStateError(session, err)
-		}
-		nextResendState.messageStash = s.messageStash
-		return nextResendState
-	}
-
-	var gapFillFlag FIXBoolean
-	if msg.Body.Has(tagGapFillFlag) {
-		if err := msg.Body.GetField(tagGapFillFlag, &gapFillFlag); err != nil {
-			return handleStateError(session, err)
-		}
-	}
-
-	if bool(gapFillFlag) && s.currentResendRangeEnd != 0 && s.currentResendRangeEnd == session.store.NextTargetMsgSeqNum() {
-		nextResendState, err := session.sendResendRequest(session.store.NextTargetMsgSeqNum(), s.resendRangeEnd)
-		if err != nil {
-			return handleStateError(session, err)
-		}
-		nextResendState.messageStash = s.messageStash
-		return nextResendState
-	}
-
-	if s.resendRangeEnd >= session.store.NextTargetMsgSeqNum() {
-		return s
-	}
-
-	for len(s.messageStash) > 0 {
-		targetSeqNum := session.store.NextTargetMsgSeqNum()
-		msg, ok := s.messageStash[targetSeqNum]
-		if !ok {
-			break
-		}
-
-		delete(s.messageStash, targetSeqNum)
-
-		nextState = inSession{}.FixMsgIn(session, msg)
-		if !nextState.IsLoggedOn() {
-			return
-		}
-	}
-
-	return
+	_ = "STUB: not implemented"
+	return *new(sessionState)
 }

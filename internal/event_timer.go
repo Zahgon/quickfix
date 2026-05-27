@@ -13,58 +13,10 @@ type EventTimer struct {
 	once  sync.Once
 }
 
-func NewEventTimer(task func()) *EventTimer {
-	t := &EventTimer{
-		f:     task,
-		timer: newStoppedTimer(),
-		done:  make(chan struct{}),
-	}
+func NewEventTimer(task func()) *EventTimer { _ = "STUB: not implemented"; return nil }
 
-	t.wg.Add(1)
-	go func() {
-		defer t.wg.Done()
+func (t *EventTimer) Stop() { _ = "STUB: not implemented"; return }
 
-		for {
-			select {
+func (t *EventTimer) Reset(timeout time.Duration) { _ = "STUB: not implemented"; return }
 
-			case <-t.timer.C:
-				t.f()
-
-			case <-t.done:
-				t.timer.Stop()
-				return
-
-			}
-		}
-	}()
-
-	return t
-}
-
-func (t *EventTimer) Stop() {
-	if t == nil {
-		return
-	}
-
-	t.once.Do(func() {
-		close(t.done)
-	})
-
-	t.wg.Wait()
-}
-
-func (t *EventTimer) Reset(timeout time.Duration) {
-	if t == nil {
-		return
-	}
-
-	t.timer.Reset(timeout)
-}
-
-func newStoppedTimer() *time.Timer {
-	timer := time.NewTimer(time.Second)
-	if !timer.Stop() {
-		<-timer.C
-	}
-	return timer
-}
+func newStoppedTimer() *time.Timer { _ = "STUB: not implemented"; return nil }

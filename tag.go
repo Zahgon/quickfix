@@ -78,54 +78,7 @@ const (
 )
 
 // IsTrailer returns true if tag belongs in the message trailer.
-func (t Tag) IsTrailer() bool {
-	switch t {
-	case tagSignatureLength, tagSignature, tagCheckSum:
-		return true
-	}
-	return false
-}
+func (t Tag) IsTrailer() bool { _ = "STUB: not implemented"; return false }
 
 // IsHeader returns true if tag belongs in the message header.
-func (t Tag) IsHeader() bool {
-	switch t {
-	case tagBeginString,
-		tagBodyLength,
-		tagMsgType,
-		tagSenderCompID,
-		tagTargetCompID,
-		tagOnBehalfOfCompID,
-		tagDeliverToCompID,
-		tagSecureDataLen,
-		tagMsgSeqNum,
-		tagSenderSubID,
-		tagSenderLocationID,
-		tagTargetSubID,
-		tagTargetLocationID,
-		tagOnBehalfOfSubID,
-		tagOnBehalfOfLocationID,
-		tagDeliverToSubID,
-		tagDeliverToLocationID,
-		tagPossDupFlag,
-		tagPossResend,
-		tagSendingTime,
-		tagOrigSendingTime,
-		tagXMLDataLen,
-		tagXMLData,
-		tagMessageEncoding,
-		tagLastMsgSeqNumProcessed,
-		tagOnBehalfOfSendingTime,
-		tagApplVerID,
-		tagCstmApplVerID,
-		tagNoHops,
-		tagApplExtID,
-		tagSecureData,
-		tagHopCompID,
-		tagHopSendingTime,
-		tagHopRefID:
-
-		return true
-	}
-
-	return false
-}
+func (t Tag) IsHeader() bool { _ = "STUB: not implemented"; return false }

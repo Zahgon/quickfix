@@ -50,14 +50,8 @@ type XMLComponentMember struct {
 	Members []*XMLComponentMember `xml:",any"`
 }
 
-func (member XMLComponentMember) isComponent() bool {
-	return member.XMLName.Local == "component"
-}
+func (member XMLComponentMember) isComponent() bool { _ = "STUB: not implemented"; return false }
 
-func (member XMLComponentMember) isGroup() bool {
-	return member.XMLName.Local == "group"
-}
+func (member XMLComponentMember) isGroup() bool { _ = "STUB: not implemented"; return false }
 
-func (member XMLComponentMember) isRequired() bool {
-	return member.Required == "Y"
-}
+func (member XMLComponentMember) isRequired() bool { _ = "STUB: not implemented"; return false }

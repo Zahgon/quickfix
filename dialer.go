@@ -16,80 +16,10 @@
 package quickfix
 
 import (
-	"fmt"
-	"net"
-	"time"
-
 	"golang.org/x/net/proxy"
-
-	"github.com/quickfixgo/quickfix/config"
 )
 
 func loadDialerConfig(settings *SessionSettings) (dialer proxy.ContextDialer, err error) {
-	stdDialer := &net.Dialer{}
-	if settings.HasSetting(config.SocketTimeout) {
-		timeout, err := settings.DurationSetting(config.SocketTimeout)
-		if err != nil {
-			timeoutInt, err := settings.IntSetting(config.SocketTimeout)
-			if err != nil {
-				return stdDialer, err
-			}
-
-			stdDialer.Timeout = time.Duration(timeoutInt) * time.Second
-		} else {
-			stdDialer.Timeout = timeout
-		}
-	}
-	dialer = stdDialer
-
-	if !settings.HasSetting(config.ProxyType) {
-		return
-	}
-
-	var proxyType string
-	if proxyType, err = settings.Setting(config.ProxyType); err != nil {
-		return
-	}
-
-	switch proxyType {
-	case "socks":
-		var proxyHost string
-		var proxyPort int
-		if proxyHost, err = settings.Setting(config.ProxyHost); err != nil {
-			return
-		} else if proxyPort, err = settings.IntSetting(config.ProxyPort); err != nil {
-			return
-		}
-
-		proxyAuth := new(proxy.Auth)
-		if settings.HasSetting(config.ProxyUser) {
-			if proxyAuth.User, err = settings.Setting(config.ProxyUser); err != nil {
-				return
-			}
-		}
-		if settings.HasSetting(config.ProxyPassword) {
-			if proxyAuth.Password, err = settings.Setting(config.ProxyPassword); err != nil {
-				return
-			}
-		}
-
-		var proxyDialer proxy.Dialer
-
-		proxyDialer, err = proxy.SOCKS5("tcp", fmt.Sprintf("%s:%d", proxyHost, proxyPort), proxyAuth, stdDialer)
-		if err != nil {
-			return
-		}
-
-		if contextDialer, ok := proxyDialer.(proxy.ContextDialer); ok {
-			dialer = contextDialer
-		} else {
-			err = fmt.Errorf("proxy does not support context dialer")
-			return
-		}
-
-	default:
-		err = fmt.Errorf("unsupported proxy type %s", proxyType)
-	}
-
-	return
+	_ = "STUB: not implemented"
+	return *new(proxy.ContextDialer), nil
 }

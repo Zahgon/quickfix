@@ -18,11 +18,6 @@ package quickfix
 // FIXBytes is a generic FIX field value, implements FieldValue.  Enables zero copy read from a FieldMap.
 type FIXBytes []byte
 
-func (f *FIXBytes) Read(bytes []byte) (err error) {
-	*f = FIXBytes(bytes)
-	return
-}
+func (f *FIXBytes) Read(bytes []byte) (err error) { _ = "STUB: not implemented"; return nil }
 
-func (f FIXBytes) Write() []byte {
-	return []byte(f)
-}
+func (f FIXBytes) Write() []byte { _ = "STUB: not implemented"; return nil }

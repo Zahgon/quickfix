@@ -25,11 +25,6 @@ type FIXDecimal struct {
 	Scale int32
 }
 
-func (d FIXDecimal) Write() []byte {
-	return []byte(d.Decimal.StringFixed(d.Scale))
-}
+func (d FIXDecimal) Write() []byte { _ = "STUB: not implemented"; return nil }
 
-func (d *FIXDecimal) Read(bytes []byte) (err error) {
-	d.Decimal, err = decimal.NewFromString(string(bytes))
-	return
-}
+func (d *FIXDecimal) Read(bytes []byte) (err error) { _ = "STUB: not implemented"; return nil }

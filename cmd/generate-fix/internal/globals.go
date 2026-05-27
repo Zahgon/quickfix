@@ -1,9 +1,6 @@
 package internal
 
 import (
-	"fmt"
-	"sort"
-
 	"github.com/quickfixgo/quickfix/datadictionary"
 )
 
@@ -17,58 +14,20 @@ var (
 // Sort fieldtypes by name.
 type byFieldName []*datadictionary.FieldType
 
-func (n byFieldName) Len() int           { return len(n) }
-func (n byFieldName) Swap(i, j int)      { n[i], n[j] = n[j], n[i] }
-func (n byFieldName) Less(i, j int) bool { return n[i].Name() < n[j].Name() }
+func (n byFieldName) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (n byFieldName) Swap(i, j int)      { _ = "STUB: not implemented"; return }
+func (n byFieldName) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
 
 func getGlobalFieldType(f *datadictionary.FieldDef) (t *datadictionary.FieldType, err error) {
-	var ok bool
-	t, ok = globalFieldTypesLookup[f.Name()]
-	if !ok {
-		err = fmt.Errorf("Unknown global type for %v", f.Name())
-	}
-
-	return
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func BuildGlobalFieldTypes(specs []*datadictionary.DataDictionary) {
-	globalFieldTypesLookup = make(fieldTypeMap)
-	for _, spec := range specs {
-		for _, field := range spec.FieldTypeByTag {
-			if oldField, ok := globalFieldTypesLookup[field.Name()]; ok {
-				// Merge old enums with new.
-				if len(oldField.Enums) > 0 && field.Enums == nil {
-					field.Enums = make(map[string]datadictionary.Enum)
-				}
-
-				for enumVal, enum := range oldField.Enums {
-					if _, ok := field.Enums[enumVal]; !ok {
-						// Verify an existing enum doesn't have the same description. Keep newer enum.
-						okToKeepEnum := true
-						for _, newEnum := range field.Enums {
-							if newEnum.Description == enum.Description {
-								okToKeepEnum = false
-								break
-							}
-						}
-
-						if okToKeepEnum {
-							field.Enums[enumVal] = enum
-						}
-					}
-				}
-			}
-
-			globalFieldTypesLookup[field.Name()] = field
-		}
-	}
-
-	GlobalFieldTypes = make([]*datadictionary.FieldType, len(globalFieldTypesLookup))
-	i := 0
-	for _, fieldType := range globalFieldTypesLookup {
-		GlobalFieldTypes[i] = fieldType
-		i++
-	}
-
-	sort.Sort(byFieldName(GlobalFieldTypes))
+	_ = "STUB: not implemented"
+	return
 }
+
+// Merge old enums with new.
+
+// Verify an existing enum doesn't have the same description. Keep newer enum.

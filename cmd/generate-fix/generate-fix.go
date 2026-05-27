@@ -1,13 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"flag"
-	"fmt"
 	"log"
 	"os"
-	"path"
-	"strconv"
 	"strings"
 	"sync"
 	"text/template"
@@ -21,27 +17,16 @@ var (
 	errors    = make(chan error)
 )
 
-func usage() {
-	fmt.Fprintf(os.Stderr, "usage: %v [flags] <path to data dictionary> ... \n", os.Args[0])
-	flag.PrintDefaults()
-	os.Exit(2)
-}
+func usage() { _ = "STUB: not implemented"; return }
 
 func getPackageName(fixSpec *datadictionary.DataDictionary) string {
-	pkg := strings.ToLower(fixSpec.FIXType) + strconv.Itoa(fixSpec.Major) + strconv.Itoa(fixSpec.Minor)
-
-	if fixSpec.ServicePack != 0 {
-		pkg += "sp" + strconv.Itoa(fixSpec.ServicePack)
-	}
-
-	return pkg
+	_ = "STUB: not implemented"
+	return ""
 }
 
 func getTransportPackageName(fixSpec *datadictionary.DataDictionary) string {
-	if fixSpec.Major >= 5 {
-		return "fixt11"
-	}
-	return getPackageName(fixSpec)
+	_ = "STUB: not implemented"
+	return ""
 }
 
 type component struct {
@@ -53,66 +38,22 @@ type component struct {
 	*datadictionary.MessageDef
 }
 
-func genHeader(pkg string, spec *datadictionary.DataDictionary) {
-	c := component{
-		Package:    pkg,
-		Name:       "Header",
-		MessageDef: spec.Header,
-		FIXSpec:    spec,
-	}
-	gen(internal.HeaderTemplate, path.Join(pkg, "header.generated.go"), c)
-}
+func genHeader(pkg string, spec *datadictionary.DataDictionary) { _ = "STUB: not implemented"; return }
 
-func genTrailer(pkg string, spec *datadictionary.DataDictionary) {
-	c := component{
-		Package:    pkg,
-		Name:       "Trailer",
-		MessageDef: spec.Trailer,
-	}
-	gen(internal.TrailerTemplate, path.Join(pkg, "trailer.generated.go"), c)
-}
+func genTrailer(pkg string, spec *datadictionary.DataDictionary) { _ = "STUB: not implemented"; return }
 
 func genMessage(fixPkg string, spec *datadictionary.DataDictionary, msg *datadictionary.MessageDef) {
-	pkgName := strings.ToLower(msg.Name)
-	transportPkg := getTransportPackageName(spec)
-
-	c := component{
-		Package:          pkgName,
-		FIXPackage:       fixPkg,
-		TransportPackage: transportPkg,
-		FIXSpec:          spec,
-		Name:             msg.Name,
-		MessageDef:       msg,
-	}
-
-	gen(internal.MessageTemplate, path.Join(fixPkg, pkgName, msg.Name+".generated.go"), c)
+	_ = "STUB: not implemented"
+	return
 }
 
-func genTags() {
-	gen(internal.TagTemplate, "tag/tag_numbers.generated.go", internal.GlobalFieldTypes)
-}
+func genTags() { _ = "STUB: not implemented"; return }
 
-func genFields() {
-	gen(internal.FieldTemplate, "field/fields.generated.go", internal.GlobalFieldTypes)
-}
+func genFields() { _ = "STUB: not implemented"; return }
 
-func genEnums() {
-	gen(internal.EnumTemplate, "enum/enums.generated.go", internal.GlobalFieldTypes)
-}
+func genEnums() { _ = "STUB: not implemented"; return }
 
-func gen(t *template.Template, fileOut string, data interface{}) {
-	defer waitGroup.Done()
-	writer := new(bytes.Buffer)
-
-	if err := t.Execute(writer, data); err != nil {
-		errors <- err
-		return
-	}
-
-	if err := internal.WriteFile(fileOut, writer.String()); err != nil {
-		errors <- err
-	}
-}
+func gen(t *template.Template, fileOut string, data interface{}) { _ = "STUB: not implemented"; return }
 
 func main() {
 	flag.Usage = usage

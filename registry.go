@@ -31,138 +31,53 @@ type Messagable interface {
 }
 
 // Send determines the session to send Messagable using header fields BeginString, TargetCompID, SenderCompID.
-func Send(m Messagable) (err error) {
-	msg := m.ToMessage()
-	var beginString FIXString
-	if err := msg.Header.GetField(tagBeginString, &beginString); err != nil {
-		return err
-	}
-
-	var targetCompID FIXString
-	if err := msg.Header.GetField(tagTargetCompID, &targetCompID); err != nil {
-		return err
-	}
-
-	var senderCompID FIXString
-	if err := msg.Header.GetField(tagSenderCompID, &senderCompID); err != nil {
-		return err
-	}
-
-	sessionID := SessionID{BeginString: string(beginString), TargetCompID: string(targetCompID), SenderCompID: string(senderCompID)}
-
-	return SendToTarget(msg, sessionID)
-}
+func Send(m Messagable) (err error) { _ = "STUB: not implemented"; return nil }
 
 // SendToTarget sends a message based on the sessionID. Convenient for use in FromApp since it provides a session ID for incoming messages.
-func SendToTarget(m Messagable, sessionID SessionID) error {
-	msg := m.ToMessage()
-	session, ok := lookupSession(sessionID)
-	if !ok {
-		return errUnknownSession
-	}
-
-	return session.queueForSend(msg)
-}
+func SendToTarget(m Messagable, sessionID SessionID) error { _ = "STUB: not implemented"; return nil }
 
 // ResetSession resets session's sequence numbers.
-func ResetSession(sessionID SessionID) error {
-	session, ok := lookupSession(sessionID)
-	if !ok {
-		return errUnknownSession
-	}
-	session.log.OnEvent("Session reset")
-	session.State.ShutdownNow(session)
-	if err := session.dropAndReset(); err != nil {
-		session.logError(err)
-		return err
-	}
-
-	return nil
-}
+func ResetSession(sessionID SessionID) error { _ = "STUB: not implemented"; return nil }
 
 // UnregisterSession removes a session from the set of known sessions.
-func UnregisterSession(sessionID SessionID) error {
-	sessionsLock.Lock()
-	defer sessionsLock.Unlock()
-
-	if _, ok := sessions[sessionID]; ok {
-		delete(sessions, sessionID)
-		return nil
-	}
-
-	return errUnknownSession
-}
+func UnregisterSession(sessionID SessionID) error { _ = "STUB: not implemented"; return nil }
 
 // SetNextTargetMsgSeqNum set the next expected target message sequence number for the session matching the session id.
 func SetNextTargetMsgSeqNum(sessionID SessionID, seqNum int) error {
-	session, ok := lookupSession(sessionID)
-	if !ok {
-		return errUnknownSession
-	}
-	return session.store.SetNextTargetMsgSeqNum(seqNum)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SetNextSenderMsgSeqNum sets the next outgoing message sequence number for the session matching the session id.
 func SetNextSenderMsgSeqNum(sessionID SessionID, seqNum int) error {
-	session, ok := lookupSession(sessionID)
-	if !ok {
-		return errUnknownSession
-	}
-	return session.store.SetNextSenderMsgSeqNum(seqNum)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetExpectedSenderNum retrieves the expected sender sequence number for the session matching the session id.
 func GetExpectedSenderNum(sessionID SessionID) (int, error) {
-	session, ok := lookupSession(sessionID)
-	if !ok {
-		return 0, errUnknownSession
-	}
-	return session.store.NextSenderMsgSeqNum(), nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 // GetExpectedTargetNum retrieves the next target sequence number for the session matching the session id.
 func GetExpectedTargetNum(sessionID SessionID) (int, error) {
-	session, ok := lookupSession(sessionID)
-	if !ok {
-		return 0, errUnknownSession
-	}
-	return session.store.NextTargetMsgSeqNum(), nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 // GetMessageStore returns the MessageStore interface for session matching the session id.
 func GetMessageStore(sessionID SessionID) (MessageStore, error) {
-	session, ok := lookupSession(sessionID)
-	if !ok {
-		return nil, errUnknownSession
-	}
-	return session.store, nil
+	_ = "STUB: not implemented"
+	return *new(MessageStore), nil
 }
 
 // GetLog returns the Log interface for session matching the session id.
-func GetLog(sessionID SessionID) (Log, error) {
-	session, ok := lookupSession(sessionID)
-	if !ok {
-		return nil, errUnknownSession
-	}
-	return session.log, nil
-}
+func GetLog(sessionID SessionID) (Log, error) { _ = "STUB: not implemented"; return *new(Log), nil }
 
-func registerSession(s *session) error {
-	sessionsLock.Lock()
-	defer sessionsLock.Unlock()
-
-	if _, ok := sessions[s.sessionID]; ok {
-		return errDuplicateSessionID
-	}
-
-	sessions[s.sessionID] = s
-	return nil
-}
+func registerSession(s *session) error { _ = "STUB: not implemented"; return nil }
 
 func lookupSession(sessionID SessionID) (s *session, ok bool) {
-	sessionsLock.RLock()
-	defer sessionsLock.RUnlock()
-
-	s, ok = sessions[sessionID]
-	return
+	_ = "STUB: not implemented"
+	return nil, false
 }

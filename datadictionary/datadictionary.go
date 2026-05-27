@@ -2,11 +2,7 @@
 package datadictionary
 
 import (
-	"encoding/xml"
 	"io"
-	"os"
-
-	"github.com/pkg/errors"
 )
 
 // DataDictionary models FIX messages, components, and fields.
@@ -47,59 +43,43 @@ type ComponentType struct {
 
 // NewComponentType returns an initialized component type.
 func NewComponentType(name string, parts []MessagePart) *ComponentType {
-	comp := ComponentType{
-		name:  name,
-		parts: parts,
-	}
-
-	for _, part := range parts {
-
-		if part.Required() {
-			comp.requiredParts = append(comp.requiredParts, part)
-		}
-
-		switch f := part.(type) {
-		case messagePartWithFields:
-			comp.fields = append(comp.fields, f.Fields()...)
-
-			if f.Required() {
-				comp.requiredFields = append(comp.requiredFields, f.RequiredFields()...)
-			}
-		case *FieldDef:
-			comp.fields = append(comp.fields, f)
-
-			if f.Required() {
-				comp.requiredFields = append(comp.requiredFields, f)
-			}
-		}
-	}
-
-	return &comp
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Name returns the name of this component type.
-func (c ComponentType) Name() string { return c.name }
+func (c ComponentType) Name() string {
+	_ = "STUB: not implemented"
 
-// Fields returns all fields contained in this component. Includes fields
-// encapsulated in components of this component.
-func (c ComponentType) Fields() []*FieldDef { return c.fields }
+	// Fields returns all fields contained in this component. Includes fields
+	// encapsulated in components of this component.
+	return ""
+}
 
-// RequiredFields returns those fields that are required for this component.
-func (c ComponentType) RequiredFields() []*FieldDef { return c.requiredFields }
+func (c ComponentType) Fields() []*FieldDef {
+	_ = "STUB: not implemented"
+
+	// RequiredFields returns those fields that are required for this component.
+	return nil
+}
+
+func (c ComponentType) RequiredFields() []*FieldDef { _ = "STUB: not implemented"; return nil }
 
 // RequiredParts returns those parts that are required for this component.
-func (c ComponentType) RequiredParts() []MessagePart { return c.requiredParts }
+func (c ComponentType) RequiredParts() []MessagePart { _ = "STUB: not implemented"; return nil }
 
 // Parts returns all parts in declaration order contained in this component.
-func (c ComponentType) Parts() []MessagePart { return c.parts }
+func (c ComponentType) Parts() []MessagePart {
+	_ = "STUB: not implemented"
 
-// TagSet is set for tags.
+	// TagSet is set for tags.
+	return nil
+}
+
 type TagSet map[int]struct{}
 
 // Add adds a tag to the tagset.
-func (t TagSet) Add(tag int) {
-	t[tag] = struct{}{}
-}
+func (t TagSet) Add(tag int) { _ = "STUB: not implemented"; return }
 
 // Component is a Component as it appears in a given MessageDef.
 type Component struct {
@@ -109,17 +89,19 @@ type Component struct {
 
 // NewComponent returns an initialized Component instance.
 func NewComponent(ct *ComponentType, required bool) *Component {
-	return &Component{
-		ComponentType: ct,
-		required:      required,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Required returns true if this component is required for the containing
 // MessageDef.
-func (c Component) Required() bool { return c.required }
+func (c Component) Required() bool {
+	_ = "STUB: not implemented"
 
-// Field models a field or repeating group in a message.
+	// Field models a field or repeating group in a message.
+	return false
+}
+
 type Field interface {
 	Tag() int
 }
@@ -137,74 +119,36 @@ type FieldDef struct {
 
 // NewFieldDef returns an initialized FieldDef.
 func NewFieldDef(fieldType *FieldType, required bool) *FieldDef {
-	return &FieldDef{
-		FieldType: fieldType,
-		required:  required,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewGroupFieldDef returns an initialized FieldDef for a repeating group.
 func NewGroupFieldDef(fieldType *FieldType, required bool, parts []MessagePart) *FieldDef {
-	field := FieldDef{
-		FieldType: fieldType,
-		required:  required,
-		Parts:     parts,
-	}
-
-	for _, part := range parts {
-		if part.Required() {
-			field.requiredParts = append(field.requiredParts, part)
-		}
-
-		if comp, ok := part.(Component); ok {
-			field.Fields = append(field.Fields, comp.Fields()...)
-
-			if comp.required {
-				field.requiredFields = append(field.requiredFields, comp.requiredFields...)
-			}
-		} else {
-			if child, ok := part.(*FieldDef); ok {
-				field.Fields = append(field.Fields, child)
-
-				if child.required {
-					field.requiredFields = append(field.requiredFields, child)
-				}
-			} else {
-				panic("unknown part")
-			}
-		}
-	}
-
-	return &field
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Required returns true if this FieldDef is required for the containing
 // MessageDef.
-func (f FieldDef) Required() bool { return f.required }
+func (f FieldDef) Required() bool {
+	_ = "STUB: not implemented"
 
-// IsGroup is true if the field is a repeating group.
-func (f FieldDef) IsGroup() bool {
-	return len(f.Fields) > 0
+	// IsGroup is true if the field is a repeating group.
+	return false
 }
+
+func (f FieldDef) IsGroup() bool { _ = "STUB: not implemented"; return false }
 
 // RequiredParts returns those parts that are required for this FieldDef. IsGroup
 // must return true.
-func (f FieldDef) RequiredParts() []MessagePart { return f.requiredParts }
+func (f FieldDef) RequiredParts() []MessagePart { _ = "STUB: not implemented"; return nil }
 
 // RequiredFields returns those fields that are required for this FieldDef. IsGroup
 // must return true.
-func (f FieldDef) RequiredFields() []*FieldDef { return f.requiredFields }
+func (f FieldDef) RequiredFields() []*FieldDef { _ = "STUB: not implemented"; return nil }
 
-func (f FieldDef) childTags() []int {
-	tags := make([]int, 0, len(f.Fields))
-
-	for _, f := range f.Fields {
-		tags = append(tags, f.Tag())
-		tags = append(tags, f.childTags()...)
-	}
-
-	return tags
-}
+func (f FieldDef) childTags() []int { _ = "STUB: not implemented"; return nil }
 
 // FieldType holds information relating to a field.  Includes Tag, type, and enums, if defined.
 type FieldType struct {
@@ -216,20 +160,25 @@ type FieldType struct {
 
 // NewFieldType returns a pointer to an initialized FieldType.
 func NewFieldType(name string, tag int, fixType string) *FieldType {
-	return &FieldType{
-		name: name,
-		tag:  tag,
-		Type: fixType,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Name returns the name for this FieldType.
-func (f FieldType) Name() string { return f.name }
+func (f FieldType) Name() string {
+	_ = "STUB: not implemented"
 
-// Tag returns the tag for this fieldType.
-func (f FieldType) Tag() int { return f.tag }
+	// Tag returns the tag for this fieldType.
+	return ""
+}
 
-// Enum is a container for value and description.
+func (f FieldType) Tag() int {
+	_ = "STUB: not implemented"
+
+	// Enum is a container for value and description.
+	return 0
+}
+
 type Enum struct {
 	Value       string
 	Description string
@@ -249,85 +198,22 @@ type MessageDef struct {
 }
 
 // RequiredParts returns those parts that are required for this Message.
-func (m MessageDef) RequiredParts() []MessagePart { return m.requiredParts }
+func (m MessageDef) RequiredParts() []MessagePart { _ = "STUB: not implemented"; return nil }
 
 // NewMessageDef returns a pointer to an initialized MessageDef.
 func NewMessageDef(name, msgType string, parts []MessagePart) *MessageDef {
-	msg := MessageDef{
-		Name:         name,
-		MsgType:      msgType,
-		Fields:       make(map[int]*FieldDef),
-		RequiredTags: make(TagSet),
-		Tags:         make(TagSet),
-		Parts:        parts,
-	}
-
-	processField := func(field *FieldDef, allowRequired bool) {
-		msg.Fields[field.Tag()] = field
-		msg.Tags.Add(field.Tag())
-		for _, t := range field.childTags() {
-			msg.Tags.Add(t)
-		}
-
-		if allowRequired && field.Required() {
-			msg.RequiredTags.Add(field.Tag())
-		}
-	}
-
-	for _, part := range parts {
-		if part.Required() {
-			msg.requiredParts = append(msg.requiredParts, part)
-		}
-
-		switch pType := part.(type) {
-		case messagePartWithFields:
-			for _, f := range pType.Fields() {
-				// Field if required in component is required in message only if
-				// component is required.
-				processField(f, pType.Required())
-			}
-
-		case *FieldDef:
-			processField(pType, true)
-
-		default:
-			panic("Unknown Part")
-		}
-	}
-
-	return &msg
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Field if required in component is required in message only if
+// component is required.
 
 // Parse loads and build a datadictionary instance from an xml file.
-func Parse(path string) (*DataDictionary, error) {
-	var xmlFile *os.File
-	var err error
-	xmlFile, err = os.Open(path)
-	if err != nil {
-		return nil, errors.Wrapf(err, "problem opening file: %v", path)
-	}
-	defer xmlFile.Close()
-
-	return ParseSrc(xmlFile)
-}
+func Parse(path string) (*DataDictionary, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // ParseSrc loads and build a datadictionary instance from an xml source.
 func ParseSrc(xmlSrc io.Reader) (*DataDictionary, error) {
-	doc := new(XMLDoc)
-	decoder := xml.NewDecoder(xmlSrc)
-	decoder.CharsetReader = func(_ string, input io.Reader) (io.Reader, error) {
-		return input, nil
-	}
-
-	if err := decoder.Decode(doc); err != nil {
-		return nil, errors.Wrapf(err, "problem parsing XML file")
-	}
-
-	b := new(builder)
-	dict, err := b.build(doc)
-	if err != nil {
-		return nil, err
-	}
-
-	return dict, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

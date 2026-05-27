@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -15,8 +14,6 @@ import (
 
 	"github.com/quickfixgo/quickfix"
 	"github.com/quickfixgo/quickfix/config"
-	field "github.com/quickfixgo/quickfix/gen/field"
-	tag "github.com/quickfixgo/quickfix/gen/tag"
 	filelog "github.com/quickfixgo/quickfix/log/file"
 	"github.com/quickfixgo/quickfix/store/file"
 	"github.com/quickfixgo/quickfix/store/mongo"
@@ -29,75 +26,38 @@ type EchoApplication struct {
 	OrderIds map[string]bool
 }
 
-func (e EchoApplication) OnCreate(sessionID quickfix.SessionID) {
-	e.log.Printf("OnCreate %v\n", sessionID.String())
-}
-func (e *EchoApplication) OnLogon(sessionID quickfix.SessionID) {
-	e.log.Printf("OnLogon %v\n", sessionID.String())
-	e.OrderIds = make(map[string]bool)
-}
-func (e *EchoApplication) OnLogout(sessionID quickfix.SessionID) {
-	e.log.Printf("OnLogout %v\n", sessionID.String())
-}
+func (e EchoApplication) OnCreate(sessionID quickfix.SessionID) { _ = "STUB: not implemented"; return }
+
+func (e *EchoApplication) OnLogon(sessionID quickfix.SessionID) { _ = "STUB: not implemented"; return }
+
+func (e *EchoApplication) OnLogout(sessionID quickfix.SessionID) { _ = "STUB: not implemented"; return }
+
 func (e EchoApplication) ToAdmin(msgBuilder *quickfix.Message, sessionID quickfix.SessionID) {
+	_ = "STUB: not implemented"
+	return
 }
 
 func (e EchoApplication) ToApp(msgBuilder *quickfix.Message, sessionID quickfix.SessionID) (err error) {
-	return
-}
-
-func (e EchoApplication) FromAdmin(msg *quickfix.Message, sessionID quickfix.SessionID) (err quickfix.MessageRejectError) {
-	return
-}
-
-func (e *EchoApplication) FromApp(msg *quickfix.Message, sessionID quickfix.SessionID) (err quickfix.MessageRejectError) {
-	e.log.Println("Got Message ", msg)
-	return router.Route(msg, sessionID)
-}
-
-func (e *EchoApplication) processMsg(msg *quickfix.Message, sessionID quickfix.SessionID) quickfix.MessageRejectError {
-	var possResend field.PossResendField
-	msg.Header.Get(&possResend)
-
-	if msg.Body.Has(tag.ClOrdID) {
-		var orderID field.ClOrdIDField
-
-		if err := msg.Body.Get(&orderID); err != nil {
-			return err
-		}
-
-		sessionOrderID := sessionID.String() + orderID.String()
-
-		if bytes.Equal(possResend.Write(), []byte("Y")) {
-			if e.OrderIds[sessionOrderID] {
-				return nil
-			}
-		}
-
-		e.OrderIds[sessionOrderID] = true
-	}
-
-	reply := copyMessage(msg)
-	if bytes.Equal(possResend.Write(), []byte("Y")) {
-		reply.Header.Set(possResend)
-	}
-
-	quickfix.SendToTarget(reply, sessionID)
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func copyMessage(msg *quickfix.Message) *quickfix.Message {
-	msgType := new(field.MsgTypeField)
-	msg.Header.Get(msgType)
-
-	msg.Header.Clear()
-	msg.Trailer.Clear()
-
-	msg.Header.Set(msgType)
-
-	return msg
+func (e EchoApplication) FromAdmin(msg *quickfix.Message, sessionID quickfix.SessionID) (err quickfix.MessageRejectError) {
+	_ = "STUB: not implemented"
+	return *new(quickfix.MessageRejectError)
 }
+
+func (e *EchoApplication) FromApp(msg *quickfix.Message, sessionID quickfix.SessionID) (err quickfix.MessageRejectError) {
+	_ = "STUB: not implemented"
+	return *new(quickfix.MessageRejectError)
+}
+
+func (e *EchoApplication) processMsg(msg *quickfix.Message, sessionID quickfix.SessionID) quickfix.MessageRejectError {
+	_ = "STUB: not implemented"
+	return *new(quickfix.MessageRejectError)
+}
+
+func copyMessage(msg *quickfix.Message) *quickfix.Message { _ = "STUB: not implemented"; return nil }
 
 func main() {
 	app := &EchoApplication{}

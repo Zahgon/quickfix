@@ -17,7 +17,6 @@ package quickfix
 
 import (
 	"bytes"
-	"sort"
 	"sync"
 	"time"
 )
@@ -25,19 +24,11 @@ import (
 // field stores a slice of TagValues.
 type field []TagValue
 
-func fieldTag(f field) Tag {
-	return f[0].tag
-}
+func fieldTag(f field) Tag { _ = "STUB: not implemented"; return *new(Tag) }
 
-func initField(f field, tag Tag, value []byte) {
-	f[0].init(tag, value)
-}
+func initField(f field, tag Tag, value []byte) { _ = "STUB: not implemented"; return }
 
-func writeField(f field, buffer *bytes.Buffer) {
-	for _, tv := range f {
-		buffer.Write(tv.bytes)
-	}
-}
+func writeField(f field, buffer *bytes.Buffer) { _ = "STUB: not implemented"; return }
 
 // tagOrder true if tag i should occur before tag j.
 type tagOrder func(i, j Tag) bool
@@ -47,9 +38,9 @@ type tagSort struct {
 	compare tagOrder
 }
 
-func (t tagSort) Len() int           { return len(t.tags) }
-func (t tagSort) Swap(i, j int)      { t.tags[i], t.tags[j] = t.tags[j], t.tags[i] }
-func (t tagSort) Less(i, j int) bool { return t.compare(t.tags[i], t.tags[j]) }
+func (t tagSort) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (t tagSort) Swap(i, j int)      { _ = "STUB: not implemented"; return }
+func (t tagSort) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
 
 // FieldMap is a collection of fix fields that make up a fix message.
 type FieldMap struct {
@@ -59,356 +50,145 @@ type FieldMap struct {
 }
 
 // ascending tags.
-func normalFieldOrder(i, j Tag) bool { return i < j }
+func normalFieldOrder(i, j Tag) bool { _ = "STUB: not implemented"; return false }
 
 func (m *FieldMap) init() {
 	m.initWithOrdering(normalFieldOrder)
 }
 
-func (m *FieldMap) initWithOrdering(ordering tagOrder) {
-	m.rwLock = &sync.RWMutex{}
-	m.tagLookup = make(map[Tag]field)
-	m.compare = ordering
-}
+func (m *FieldMap) initWithOrdering(ordering tagOrder) { _ = "STUB: not implemented"; return }
 
 // Tags returns all of the Field Tags in this FieldMap.
-func (m FieldMap) Tags() []Tag {
-	m.rwLock.RLock()
-	defer m.rwLock.RUnlock()
-
-	tags := make([]Tag, 0, len(m.tagLookup))
-	for t := range m.tagLookup {
-		tags = append(tags, t)
-	}
-
-	return tags
-}
+func (m FieldMap) Tags() []Tag { _ = "STUB: not implemented"; return nil }
 
 // Get parses out a field in this FieldMap. Returned reject may indicate the field is not present, or the field value is invalid.
 func (m FieldMap) Get(parser Field) MessageRejectError {
-	return m.GetField(parser.Tag(), parser)
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // Has returns true if the Tag is present in this FieldMap.
-func (m FieldMap) Has(tag Tag) bool {
-	m.rwLock.RLock()
-	defer m.rwLock.RUnlock()
-
-	_, ok := m.tagLookup[tag]
-	return ok
-}
+func (m FieldMap) Has(tag Tag) bool { _ = "STUB: not implemented"; return false }
 
 // GetField parses of a field with Tag tag. Returned reject may indicate the field is not present, or the field value is invalid.
 func (m FieldMap) GetField(tag Tag, parser FieldValueReader) MessageRejectError {
-	m.rwLock.RLock()
-	defer m.rwLock.RUnlock()
-
-	f, ok := m.tagLookup[tag]
-	if !ok {
-		return ConditionallyRequiredFieldMissing(tag)
-	}
-
-	if err := parser.Read(f[0].value); err != nil {
-		return IncorrectDataFormatForValue(tag)
-	}
-
-	return nil
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // GetField parses of a field with Tag tag. Returned reject may indicate the field is not present, or the field value is invalid.
 func (m FieldMap) getFieldNoLock(tag Tag, parser FieldValueReader) MessageRejectError {
-	f, ok := m.tagLookup[tag]
-	if !ok {
-		return ConditionallyRequiredFieldMissing(tag)
-	}
-
-	if err := parser.Read(f[0].value); err != nil {
-		return IncorrectDataFormatForValue(tag)
-	}
-
-	return nil
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // GetBytes is a zero-copy GetField wrapper for []bytes fields.
 func (m FieldMap) GetBytes(tag Tag) ([]byte, MessageRejectError) {
-	m.rwLock.RLock()
-	defer m.rwLock.RUnlock()
-
-	f, ok := m.tagLookup[tag]
-	if !ok {
-		return nil, ConditionallyRequiredFieldMissing(tag)
-	}
-
-	return f[0].value, nil
+	_ = "STUB: not implemented"
+	return nil, *new(MessageRejectError)
 }
 
 // getBytesNoLock is a lock free zero-copy GetField wrapper for []bytes fields.
 func (m FieldMap) getBytesNoLock(tag Tag) ([]byte, MessageRejectError) {
-	f, ok := m.tagLookup[tag]
-	if !ok {
-		return nil, ConditionallyRequiredFieldMissing(tag)
-	}
-
-	return f[0].value, nil
+	_ = "STUB: not implemented"
+	return nil, *new(MessageRejectError)
 }
 
 // GetBool is a GetField wrapper for bool fields.
 func (m FieldMap) GetBool(tag Tag) (bool, MessageRejectError) {
-	var val FIXBoolean
-	if err := m.GetField(tag, &val); err != nil {
-		return false, err
-	}
-	return bool(val), nil
+	_ = "STUB: not implemented"
+	return false, *new(MessageRejectError)
 }
 
 // GetInt is a GetField wrapper for int fields.
 func (m FieldMap) GetInt(tag Tag) (int, MessageRejectError) {
-	bytes, err := m.GetBytes(tag)
-	if err != nil {
-		return 0, err
-	}
-
-	var val FIXInt
-	if val.Read(bytes) != nil {
-		err = IncorrectDataFormatForValue(tag)
-	}
-
-	return int(val), err
+	_ = "STUB: not implemented"
+	return 0, *new(MessageRejectError)
 }
 
 // GetInt is a lock free GetField wrapper for int fields.
 func (m FieldMap) getIntNoLock(tag Tag) (int, MessageRejectError) {
-	bytes, err := m.getBytesNoLock(tag)
-	if err != nil {
-		return 0, err
-	}
-
-	var val FIXInt
-	if val.Read(bytes) != nil {
-		err = IncorrectDataFormatForValue(tag)
-	}
-
-	return int(val), err
+	_ = "STUB: not implemented"
+	return 0, *new(MessageRejectError)
 }
 
 // GetTime is a GetField wrapper for utc timestamp fields.
 func (m FieldMap) GetTime(tag Tag) (t time.Time, err MessageRejectError) {
-	m.rwLock.RLock()
-	defer m.rwLock.RUnlock()
-
-	bytes, err := m.GetBytes(tag)
-	if err != nil {
-		return
-	}
-
-	var val FIXUTCTimestamp
-	if val.Read(bytes) != nil {
-		err = IncorrectDataFormatForValue(tag)
-	}
-
-	return val.Time, err
+	_ = "STUB: not implemented"
+	return *new(time.Time), *new(MessageRejectError)
 }
 
 // GetString is a GetField wrapper for string fields.
 func (m FieldMap) GetString(tag Tag) (string, MessageRejectError) {
-	var val FIXString
-	if err := m.GetField(tag, &val); err != nil {
-		return "", err
-	}
-	return string(val), nil
+	_ = "STUB: not implemented"
+	return "", *new(MessageRejectError)
 }
 
 // GetString is a GetField wrapper for string fields.
 func (m FieldMap) getStringNoLock(tag Tag) (string, MessageRejectError) {
-	var val FIXString
-	if err := m.getFieldNoLock(tag, &val); err != nil {
-		return "", err
-	}
-	return string(val), nil
+	_ = "STUB: not implemented"
+	return "", *new(MessageRejectError)
 }
 
 // GetGroup is a Get function specific to Group Fields.
 func (m FieldMap) GetGroup(parser FieldGroupReader) MessageRejectError {
-	m.rwLock.RLock()
-	defer m.rwLock.RUnlock()
-
-	f, ok := m.tagLookup[parser.Tag()]
-	if !ok {
-		return ConditionallyRequiredFieldMissing(parser.Tag())
-	}
-
-	if _, err := parser.Read(f); err != nil {
-		if msgRejErr, ok := err.(MessageRejectError); ok {
-			return msgRejErr
-		}
-		return IncorrectDataFormatForValue(parser.Tag())
-	}
-
-	return nil
+	_ = "STUB: not implemented"
+	return *new(MessageRejectError)
 }
 
 // SetField sets the field with Tag tag.
 func (m *FieldMap) SetField(tag Tag, field FieldValueWriter) *FieldMap {
-	return m.SetBytes(tag, field.Write())
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SetBytes sets bytes.
-func (m *FieldMap) SetBytes(tag Tag, value []byte) *FieldMap {
-	f := m.getOrCreate(tag)
-	initField(f, tag, value)
-	return m
-}
+func (m *FieldMap) SetBytes(tag Tag, value []byte) *FieldMap { _ = "STUB: not implemented"; return nil }
 
 // SetBool is a SetField wrapper for bool fields.
-func (m *FieldMap) SetBool(tag Tag, value bool) *FieldMap {
-	return m.SetField(tag, FIXBoolean(value))
-}
+func (m *FieldMap) SetBool(tag Tag, value bool) *FieldMap { _ = "STUB: not implemented"; return nil }
 
 // SetInt is a SetField wrapper for int fields.
-func (m *FieldMap) SetInt(tag Tag, value int) *FieldMap {
-	v := FIXInt(value)
-	return m.SetBytes(tag, v.Write())
-}
+func (m *FieldMap) SetInt(tag Tag, value int) *FieldMap { _ = "STUB: not implemented"; return nil }
 
 // SetString is a SetField wrapper for string fields.
 func (m *FieldMap) SetString(tag Tag, value string) *FieldMap {
-	return m.SetBytes(tag, []byte(value))
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Remove removes a tag from field map.
-func (m *FieldMap) Remove(tag Tag) {
-	m.rwLock.Lock()
-	defer m.rwLock.Unlock()
-
-	delete(m.tagLookup, tag)
-}
+func (m *FieldMap) Remove(tag Tag) { _ = "STUB: not implemented"; return }
 
 // Clear purges all fields from field map.
-func (m *FieldMap) Clear() {
-	m.rwLock.Lock()
-	defer m.rwLock.Unlock()
+func (m *FieldMap) Clear() { _ = "STUB: not implemented"; return }
 
-	m.tags = m.tags[0:0]
-	for k := range m.tagLookup {
-		delete(m.tagLookup, k)
-	}
-}
-
-func (m *FieldMap) clearNoLock() {
-	m.tags = m.tags[0:0]
-	for k := range m.tagLookup {
-		delete(m.tagLookup, k)
-	}
-}
+func (m *FieldMap) clearNoLock() { _ = "STUB: not implemented"; return }
 
 // CopyInto overwrites the given FieldMap with this one.
-func (m *FieldMap) CopyInto(to *FieldMap) {
-	m.rwLock.RLock()
-	defer m.rwLock.RUnlock()
+func (m *FieldMap) CopyInto(to *FieldMap) { _ = "STUB: not implemented"; return }
 
-	to.tagLookup = make(map[Tag]field)
-	for tag, f := range m.tagLookup {
-		clone := make(field, 1)
-		clone[0] = f[0]
-		to.tagLookup[tag] = clone
-	}
-	to.tags = make([]Tag, len(m.tags))
-	copy(to.tags, m.tags)
-	to.compare = m.compare
-}
+func (m *FieldMap) add(f field) { _ = "STUB: not implemented"; return }
 
-func (m *FieldMap) add(f field) {
-	t := fieldTag(f)
-	if _, ok := m.tagLookup[t]; !ok {
-		m.tags = append(m.tags, t)
-	}
-
-	m.tagLookup[t] = f
-}
-
-func (m *FieldMap) getOrCreate(tag Tag) field {
-	m.rwLock.Lock()
-	defer m.rwLock.Unlock()
-
-	if f, ok := m.tagLookup[tag]; ok {
-		f = f[:1]
-		return f
-	}
-
-	f := make(field, 1)
-	m.tagLookup[tag] = f
-	m.tags = append(m.tags, tag)
-	return f
-}
+func (m *FieldMap) getOrCreate(tag Tag) field { _ = "STUB: not implemented"; return *new(field) }
 
 // Set is a setter for fields.
-func (m *FieldMap) Set(field FieldWriter) *FieldMap {
-	f := m.getOrCreate(field.Tag())
-	initField(f, field.Tag(), field.Write())
-	return m
-}
+func (m *FieldMap) Set(field FieldWriter) *FieldMap { _ = "STUB: not implemented"; return nil }
 
 // SetGroup is a setter specific to group fields.
 func (m *FieldMap) SetGroup(field FieldGroupWriter) *FieldMap {
-	m.rwLock.Lock()
-	defer m.rwLock.Unlock()
-
-	_, ok := m.tagLookup[field.Tag()]
-	if !ok {
-		m.tags = append(m.tags, field.Tag())
-	}
-	m.tagLookup[field.Tag()] = field.Write()
-	return m
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (m *FieldMap) sortedTags() []Tag {
-	sort.Sort(m)
-	return m.tags
-}
+func (m *FieldMap) sortedTags() []Tag { _ = "STUB: not implemented"; return nil }
 
-func (m FieldMap) write(buffer *bytes.Buffer) {
-	m.rwLock.Lock()
-	defer m.rwLock.Unlock()
+func (m FieldMap) write(buffer *bytes.Buffer) { _ = "STUB: not implemented"; return }
 
-	for _, tag := range m.sortedTags() {
-		if f, ok := m.tagLookup[tag]; ok {
-			writeField(f, buffer)
-		}
-	}
-}
+func (m FieldMap) total() int { _ = "STUB: not implemented"; return 0 }
 
-func (m FieldMap) total() int {
-	m.rwLock.RLock()
-	defer m.rwLock.RUnlock()
+// Tag does not contribute to total.
 
-	total := 0
-	for _, fields := range m.tagLookup {
-		for _, tv := range fields {
-			switch tv.tag {
-			case tagCheckSum: // Tag does not contribute to total.
-			default:
-				total += tv.total()
-			}
-		}
-	}
+func (m FieldMap) length() int { _ = "STUB: not implemented"; return 0 }
 
-	return total
-}
-
-func (m FieldMap) length() int {
-	m.rwLock.RLock()
-	defer m.rwLock.RUnlock()
-
-	length := 0
-	for _, fields := range m.tagLookup {
-		for _, tv := range fields {
-			switch tv.tag {
-			case tagBeginString, tagBodyLength, tagCheckSum: // Tags do not contribute to length.
-			default:
-				length += tv.length()
-			}
-		}
-	}
-
-	return length
-}
+// Tags do not contribute to length.

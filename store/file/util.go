@@ -16,69 +16,21 @@
 package file
 
 import (
-	"fmt"
 	"os"
-	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/quickfixgo/quickfix"
 )
 
-func createFilenamePrefix(s quickfix.SessionID) string {
-	sender := []string{s.SenderCompID}
-	if s.SenderSubID != "" {
-		sender = append(sender, s.SenderSubID)
-	}
-	if s.SenderLocationID != "" {
-		sender = append(sender, s.SenderLocationID)
-	}
-
-	target := []string{s.TargetCompID}
-	if s.TargetSubID != "" {
-		target = append(target, s.TargetSubID)
-	}
-	if s.TargetLocationID != "" {
-		target = append(target, s.TargetLocationID)
-	}
-
-	fname := []string{s.BeginString, strings.Join(sender, "_"), strings.Join(target, "_")}
-	if s.Qualifier != "" {
-		fname = append(fname, s.Qualifier)
-	}
-	return strings.Join(fname, "-")
-}
+func createFilenamePrefix(s quickfix.SessionID) string { _ = "STUB: not implemented"; return "" }
 
 // closeSyncFile behaves like Sync and Close, except that no error is returned if the file does not exist.
-func closeSyncFile(f *os.File) error {
-	if f != nil {
-		if err := f.Sync(); err != nil {
-			if !os.IsNotExist(err) {
-				return err
-			}
-		}
-		if err := f.Close(); err != nil {
-			if !os.IsNotExist(err) {
-				return err
-			}
-		}
-	}
-	return nil
-}
+func closeSyncFile(f *os.File) error { _ = "STUB: not implemented"; return nil }
 
 // removeFile behaves like os.Remove, except that no error is returned if the file does not exist.
-func removeFile(fname string) error {
-	if err := os.Remove(fname); (err != nil) && !os.IsNotExist(err) {
-		return errors.Wrapf(err, "remove %v", fname)
-	}
-	return nil
-}
+func removeFile(fname string) error { _ = "STUB: not implemented"; return nil }
 
 // openOrCreateFile opens a file for reading and writing, creating it if necessary.
 func openOrCreateFile(fname string, perm os.FileMode) (f *os.File, err error) {
-	if f, err = os.OpenFile(fname, os.O_RDWR, perm); err != nil {
-		if f, err = os.OpenFile(fname, os.O_RDWR|os.O_CREATE, perm); err != nil {
-			return nil, fmt.Errorf("error opening or creating file: %s: %s", fname, err.Error())
-		}
-	}
-	return f, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
